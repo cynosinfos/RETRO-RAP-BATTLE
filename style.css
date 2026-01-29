@@ -1,0 +1,832 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+canvas {
+    image-rendering: pixelated;
+    /* Ensure sharp pixel art scaling */
+}
+
+body,
+html {
+    width: 100%;
+    height: 100%;
+    background-color: #050505;
+    /* Dark cabinet background */
+    overflow: hidden;
+}
+
+/* CRT SCANLINE OVERLAY REMOVED */
+
+
+/* ARCADE BEZEL */
+#game-container {
+    border: 15px solid #1a1a1a;
+    border-radius: 4px;
+    outline: 5px solid #333;
+    /* Plastic trim */
+    /* Neon glow reflection on cabinet */
+    box-shadow: 0 0 100px rgba(0, 255, 255, 0.1);
+}
+
+/* TILT ANIMATION */
+@keyframes shake {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-2px, -2px);
+    }
+
+    20% {
+        transform: translate(2px, 2px);
+    }
+
+    30% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(2px, -2px);
+    }
+
+    50% {
+        transform: translate(-1px, 1px);
+    }
+
+    60% {
+        transform: translate(1px, -1px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+.shake-effect {
+    animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+/* Ensure font is loaded for all */
+body {
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Mobile Controls Styles */
+#mobile-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    height: 150px;
+    z-index: 10000;
+    pointer-events: none;
+    /* Let clicks pass through empty space */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+#dpad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
+    gap: 10px;
+}
+
+/* News Ticker Styles */
+#newsTickerBar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.95);
+    border-bottom: 2px solid #ff0055;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    /* Changed font to sans-serif to support Polish characters (Press Start 2P missing ą,ę,ś...) */
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    color: #00ffff;
+}
+
+#newsClock {
+    padding: 0 15px;
+    background-color: #ff0055;
+    color: white;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    z-index: 10;
+    flex-shrink: 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+}
+
+#newsContent {
+    white-space: nowrap;
+    display: inline-block;
+    padding-left: 100%;
+    animation: ticker 25s linear infinite;
+    flex-shrink: 0;
+    /* Prevent collapsing */
+}
+
+@keyframes ticker {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    100% {
+        transform: translate3d(-100%, 0, 0);
+    }
+}
+
+/* Statistics Iceberg Screen */
+#statsScreen {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    /* hidden by default */
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('img/iceberg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    overflow: hidden;
+}
+
+.stats-header {
+    margin-top: 60px;
+    margin-bottom: 20px;
+    text-shadow: 4px 4px #000;
+    text-align: center;
+}
+
+.iceberg-container {
+    width: 90%;
+    max-width: 800px;
+    flex: 1;
+    overflow-y: auto;
+    border: 4px solid white;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Scrollbar sleek */
+.iceberg-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.iceberg-container::-webkit-scrollbar-thumb {
+    background: white;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 10px;
+}
+
+.stat-row:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tier-label {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: yellow;
+    font-size: 12px;
+}
+
+
+.dpad-row {
+    display: flex;
+    gap: 10px;
+}
+
+.dpad-btn {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    user-select: none;
+    touch-action: none;
+}
+
+.dpad-btn:active {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+#action-buttons {
+    display: flex;
+    gap: 20px;
+    pointer-events: auto;
+    align-items: flex-end;
+}
+
+.action-btn {
+    width: 90px;
+    height: 90px;
+    background: rgba(255, 0, 85, 0.2);
+    border: 2px solid rgba(255, 0, 85, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 10px;
+    text-align: center;
+    user-select: none;
+    touch-action: none;
+}
+
+.action-btn:active {
+    background: rgba(255, 0, 85, 0.5);
+}
+
+#btn-punch {
+    background: rgba(0, 255, 255, 0.2);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    width: 100px;
+    height: 100px;
+}
+
+#btn-punch:active {
+    background: rgba(0, 255, 255, 0.5);
+}
+
+@media (max-width: 1024px) {
+    #mobile-controls {
+        display: flex !important;
+    }
+
+    #mobile-toggle {
+        display: block !important;
+    }
+}
+
+/* Round System UI */
+.round-pip {
+    width: 15px;
+    height: 15px;
+    border: 2px solid white;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Dark background for visibility */
+    box-shadow: 2px 2px rgba(0, 0, 0, 0.8);
+    transition: all 0.3s ease;
+}
+
+.round-pip.filled {
+    background-color: #00ff00;
+    /* Green for win */
+    box-shadow: 0 0 10px #00ff00;
+    border-color: #00ff00;
+}
+
+/* Retro Fire Flipper Text Style */
+.retro-fire-text {
+    font-family: 'Press Start 2P', cursive;
+    color: #ffff00;
+    /* Yellow face */
+    text-shadow:
+        4px 4px 0px #ff4500,
+        /* Orange-Red 3D depth */
+        8px 8px 0px #8b0000,
+        /* Dark Red 3D depth */
+        10px 10px 10px rgba(0, 0, 0, 0.9);
+    /* Drop Shadow */
+    font-weight: bold;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    transform: skew(-5deg);
+    /* Slight italic for speed */
+}
+
+/* Optional: Fire Animation */
+@keyframes firePulse {
+    0% {
+        filter: brightness(100%);
+        transform: skew(-5deg) scale(1);
+    }
+
+    50% {
+        filter: brightness(130%);
+        transform: skew(-5deg) scale(1.05);
+    }
+
+    100% {
+        filter: brightness(100%);
+        transform: skew(-5deg) scale(1);
+    }
+}
+
+.retro-fire-text.animate {
+    animation: firePulse 0.5s infinite;
+}
+
+/* Main Menu Selection */
+.menu-option {
+    padding: 5px;
+    transition: all 0.1s ease;
+}
+
+.menu-option.selected {
+    color: white !important;
+    text-shadow: 2px 2px #ff0055 !important;
+}
+
+.menu-option.selected::before {
+    content: "> ";
+    color: #00ffff;
+}
+
+
+/* Super Attack Flash */
+.screen-flash {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.6);
+    z-index: 20000;
+    animation: flash 0.15s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes flash {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   RETRO ARCADE EFFECTS
+   ============================================ */
+
+/* 1. CRT BENDING EFFECT */
+#gameScreen {
+    position: relative;
+}
+
+#gameScreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center,
+            transparent 0%,
+            transparent 70%,
+            rgba(0, 0, 0, 0.3) 100%);
+    pointer-events: none;
+    z-index: 9998;
+}
+
+canvas {
+    filter: contrast(1.1) brightness(1.05);
+    transform-style: preserve-3d;
+}
+
+/* 2. GLITCH EFFECT (activated via JS class) */
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+        filter: hue-rotate(0deg);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+        filter: hue-rotate(90deg);
+    }
+
+    40% {
+        transform: translate(-2px, -2px);
+        filter: hue-rotate(180deg);
+    }
+
+    60% {
+        transform: translate(2px, 2px);
+        filter: hue-rotate(270deg);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+        filter: hue-rotate(360deg);
+    }
+
+    100% {
+        transform: translate(0);
+        filter: hue-rotate(0deg);
+    }
+}
+
+@keyframes chromatic {
+    0% {
+        text-shadow: -2px 0 red, 2px 0 cyan;
+    }
+
+    50% {
+        text-shadow: 2px 0 red, -2px 0 cyan;
+    }
+
+    100% {
+        text-shadow: -2px 0 red, 2px 0 cyan;
+    }
+}
+
+.glitch-effect {
+    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both,
+        chromatic 0.3s infinite;
+}
+
+/* 4. COMBO COUNTER */
+#comboCounter {
+    position: absolute;
+    top: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.combo-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 24px;
+    color: #ffff00;
+    text-shadow:
+        2px 2px 0px #ff4500,
+        4px 4px 0px #8b0000,
+        6px 6px 10px rgba(0, 0, 0, 0.9);
+    animation: comboAppear 0.3s ease-out;
+}
+
+@keyframes comboAppear {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.combo-text.ultra {
+    font-size: 36px;
+    color: #ff0055;
+    animation: comboPulse 0.5s ease-in-out infinite;
+}
+
+@keyframes comboPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        filter: brightness(100%);
+    }
+
+    50% {
+        transform: scale(1.1);
+        filter: brightness(150%);
+    }
+}
+
+/* 5. PERFECT/EXCELLENT TEXT */
+#performanceText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.performance-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 48px;
+    color: #00ffff;
+    text-shadow:
+        4px 4px 0px #ff0055,
+        8px 8px 0px #000,
+        0 0 20px #00ffff;
+    animation: performanceAppear 1.5s ease-out forwards;
+}
+
+@keyframes performanceAppear {
+    0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+    }
+
+    20% {
+        transform: scale(1.3) rotate(5deg);
+        opacity: 1;
+    }
+
+    80% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* 6. TRAIL EFFECT */
+.fighter-trail {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.5;
+    filter: blur(2px);
+    animation: trailFade 0.3s ease-out forwards;
+}
+
+@keyframes trailFade {
+    0% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* 7. IMPACT PARTICLES */
+.impact-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleExplode 0.5s ease-out forwards;
+}
+
+@keyframes particleExplode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(var(--px), var(--py)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Combo Counter Centered */
+#comboCounter {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffeb3b;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 30px;
+    z-index: 1000;
+    display: none;
+    text-shadow: 4px 4px 0px #000;
+    pointer-events: none;
+}
+
+/* ============================================
+   NOWE EFEKTY - WERSJA 36
+   ============================================ */
+
+/* K.O. RED OVERLAY */
+.ko-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(139, 0, 0, 0.7) 100%);
+    z-index: 15000;
+    animation: koFade 1.5s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes koFade {
+    0% {
+        opacity: 0;
+    }
+
+    30% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+/* SCREEN CRACK EFFECT (Super Attack) */
+/* SCREEN CRACK EFFECT (Super Attack) */
+.screen-crack {
+    position: absolute;
+    /* Scale with container */
+    inset: 0;
+    z-index: 10000;
+    /* Lower than overlay but high */
+    pointer-events: none;
+    background-image:
+        linear-gradient(90deg, transparent 45%, rgba(255, 255, 255, 0.95) 49%, rgba(255, 255, 255, 0.95) 51%, transparent 55%),
+        linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.9) 49%, rgba(255, 255, 255, 0.9) 51%, transparent 55%),
+        linear-gradient(135deg, transparent 45%, rgba(255, 255, 255, 0.9) 49%, rgba(255, 255, 255, 0.9) 51%, transparent 55%),
+        linear-gradient(30deg, transparent 45%, rgba(255, 255, 255, 0.8) 49%, rgba(255, 255, 255, 0.8) 51%, transparent 55%),
+        linear-gradient(150deg, transparent 45%, rgba(255, 255, 255, 0.8) 49%, rgba(255, 255, 255, 0.8) 51%, transparent 55%);
+    background-size: 100% 100%;
+    animation: crackAppear 0.6s ease-out forwards;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 1));
+}
+
+@keyframes crackAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    20% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+/* ENHANCED SCREEN SHAKE VARIATIONS */
+.shake-heavy {
+    animation: shakeHeavy 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+.shake-medium {
+    animation: shakeMedium 0.4s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+.shake-light {
+    animation: shakeLight 0.3s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes shakeHeavy {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-5px, -5px);
+    }
+
+    20% {
+        transform: translate(5px, 5px);
+    }
+
+    30% {
+        transform: translate(-5px, 5px);
+    }
+
+    40% {
+        transform: translate(5px, -5px);
+    }
+
+    50% {
+        transform: translate(-3px, 3px);
+    }
+
+    60% {
+        transform: translate(3px, -3px);
+    }
+
+    70% {
+        transform: translate(-2px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+    }
+
+    90% {
+        transform: translate(-1px, 1px);
+    }
+}
+
+@keyframes shakeMedium {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-3px, -3px);
+    }
+
+    20% {
+        transform: translate(3px, 3px);
+    }
+
+    30% {
+        transform: translate(-3px, 3px);
+    }
+
+    40% {
+        transform: translate(3px, -3px);
+    }
+
+    50% {
+        transform: translate(-2px, 2px);
+    }
+
+    60% {
+        transform: translate(2px, -2px);
+    }
+
+    80% {
+        transform: translate(-1px, 1px);
+    }
+}
+
+@keyframes shakeLight {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-2px, -2px);
+    }
+
+    20% {
+        transform: translate(2px, 2px);
+    }
+
+    30% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(2px, -2px);
+    }
+
+    60% {
+        transform: translate(-1px, 1px);
+    }
+
+    80% {
+        transform: translate(1px, -1px);
+    }
+}
+
+/* GLOW EFFECT (Full Energy) */
+.fighter-glow {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 40px rgba(255, 165, 0, 0.6)) brightness(1.2);
+    animation: glowPulse 1s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 40px rgba(255, 165, 0, 0.6)) brightness(1.2);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1)) drop-shadow(0 0 60px rgba(255, 165, 0, 0.8)) brightness(1.3);
+    }
+}

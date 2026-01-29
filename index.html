@@ -1,0 +1,684 @@
+<!-- POPRAWNY PLIK - WERSJA 39 - EDYTOWANY PRZEZ AI -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fighting Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=39">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(err => console.log('SW failed', err));
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <!-- News Ticker (Global) -->
+    <div id="newsTickerBar" style="display: none;">
+        <div id="newsClock">00:00</div>
+        <div id="newsContent">LADOWANIE RAP NEWS...</div>
+    </div>
+
+    <!-- Error Console (Hidden by default) -->
+    <div id="error-console"
+        style="position: fixed; top: 0; left: 0; width: 100%; background: rgba(255,0,0,0.8); color: white; z-index: 9999; font-family: monospace; padding: 10px; display: none; pointer-events: none;">
+    </div>
+    <script>
+        window.onerror = function (message, source, lineno, colno, error) {
+            const consoleDiv = document.getElementById('error-console');
+            consoleDiv.style.display = 'block';
+            consoleDiv.innerHTML += `<div>Error: ${message} at ${source}:${lineno}</div>`;
+        };
+    </script>
+
+    <!-- Global ESC Button -->
+    <div id="globalEscBtn"
+        style="position: fixed; top: 50px; left: 10px; z-index: 9999; color: white; border: 2px solid white; padding: 5px 10px; font-family: 'Press Start 2P'; font-size: 10px; cursor: pointer; display: none; background-color: rgba(0,0,0,0.5);">
+        ESC
+    </div>
+
+    <!-- INTRO SEQUENCE -->
+    <div id="introScreen"
+        style="position: fixed; inset: 0; background-color: #000; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+        <!-- NEW LOGO -->
+        <img src="img/logo.png" alt="RETRO RAP BATTLE"
+            style="width: 600px; image-rendering: pixelated; margin-bottom: 20px;">
+        <div style="margin-top: 50px; color: #00ffff; font-family: 'Press Start 2P'; animation: blink 1s infinite;">
+            WRZUC MONETE LUB NACISNIJ ABY ROZPOCZAC</div>
+
+        <!-- DISCLAIMER -->
+        <div
+            style="margin-top: 60px; max-width: 800px; text-align: center; color: white; font-family: 'Press Start 2P', cursive; font-size: 10px; line-height: 1.6; padding: 0 20px;">
+            GRA STWORZONA W CELACH HUMORYSTYCZNYCH ABY WYJSC NA PRZECIW FANOW POLSKIEGO RAPU ZEBY MOGLI SAMI ROZLADOWAC
+            EMOCJE I ROZWIAZAC KONFLIKTY KTORE WIECZNIE POTEGUJA W SOCIAL MEDIACH. TWORCA NIE MA ZAMIARU NIKOGO OBRAZIC
+            ANI ZARABIAC NA GRZE RACZEJ TYLKO WLOZYC W NIA SWOJ CZAS. JEZELI KTOS CZUJE SIE URAZONY PROSZE O KONTAKT NA
+            EMAIL <span style="font-weight: bold; color: red;">CYNOS.INFOS@GMAIL.COM</span> I POSTAĆ ZOSTANIE USUNIETA.
+        </div>
+    </div>
+
+    <!-- Intro Styles & Script -->
+    <style>
+        .graffiti-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+            transform: rotate(-5deg);
+            /* Slight graffiti tilt */
+        }
+
+        .graffiti-line {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 100px;
+            /* Bigger size */
+            line-height: 0.9;
+        }
+
+        .neon-blue {
+            color: #00ffff;
+            text-shadow: 4px 4px 0px #000, 8px 8px 0px #008b8b;
+        }
+
+        .neon-pink {
+            color: #ff0055;
+            text-shadow: 4px 4px 0px #000, 8px 8px 0px #8b0000;
+            margin-left: 40px;
+            /* Slanted alignment effect */
+        }
+
+        .neon-green {
+            color: #00ff00;
+            text-shadow: 4px 4px 0px #000, 8px 8px 0px #006400;
+            margin-left: -20px;
+        }
+
+        .neon-text {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 40px #00ffff;
+            animation: flicker 2s infinite alternate;
+        }
+
+        .neon-text-pink {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #ff0055, 0 0 30px #ff0055, 0 0 40px #ff0055;
+            animation: flicker 2.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+
+            0%,
+            19%,
+            21%,
+            23%,
+            25%,
+            54%,
+            56%,
+            100% {
+                opacity: 1;
+            }
+
+            20%,
+            24%,
+            55% {
+                opacity: 0.3;
+            }
+        }
+    </style>
+
+    <script>
+        document.getElementById('introScreen').addEventListener('click', () => {
+            if (window.showMainMenu) {
+                window.showMainMenu();
+            } else {
+                // Fallback if JS not loaded yet (shouldn't happen but safe)
+                const intro = document.getElementById('introScreen');
+                intro.style.transition = 'opacity 1s';
+                intro.style.opacity = '0';
+                setTimeout(() => {
+                    intro.style.display = 'none';
+                    document.getElementById('menuScreen').style.display = 'flex';
+                }, 1000);
+            }
+        });
+    </script>
+
+
+    <!-- Game Container (Scales to fit screen) -->
+    <div id="game-container"
+        style="position: relative; width: 1024px; height: 576px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+
+        <!-- CRT REMOVED -->
+
+        <!-- Character Selection Menu -->
+        <div id="menuScreen"
+            style="position: absolute; inset: 0; background-color: #202020; display: none; flex-direction: column; align-items: center; justify-content: start; padding-top: 20px; border: 4px solid white; box-sizing: border-box; z-index: 10;">
+            <h1
+                style="color: white; font-family: 'Press Start 2P', cursive; margin-bottom: 20px; font-size: 24px; text-shadow: 4px 4px #ff0055;">
+                WYBIERZ POSTAC</h1>
+
+
+
+
+
+            <!-- 4 COLUMNS LAYOUT -->
+            <div
+                style="display: flex; gap: 10px; width: 100%; flex: 1; min-height: 0; margin-bottom: 10px; padding: 0 20px; box-sizing: border-box;">
+
+                <!-- Team 2115 -->
+                <div
+                    style="flex: 1; display: flex; flex-direction: column; align-items: center; border-right: 1px solid #333;">
+                    <h2
+                        style="color: #00ff00; font-family: 'Press Start 2P', cursive; font-size: 14px; margin-bottom: 10px;">
+                        2115</h2>
+                    <div id="team2115List" class="char-list-container">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- MOVED CHARACTER PREVIEW -->
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+
+                        <!-- P2 PREVIEW (Top) -->
+                        <div id="charPreviewP2"
+                            style="width: 150px; height: 140px; pointer-events: none; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.5); border: 2px solid #00ffff;">
+                            <img id="charPreviewUnknownP2" src="img/logo.png"
+                                style="width: 100%; opacity: 0.5; display: block;">
+
+                            <!-- Dynamic Sprite P2 (Wider) -->
+                            <div id="charPreviewSpriteP2"
+                                style="width: 140px; height: 100px; background-repeat: no-repeat; display: none; image-rendering: pixelated;">
+                            </div>
+                            <h2 id="charPreviewNameP2"
+                                style="color: #00ffff; font-family: 'Press Start 2P'; font-size: 8px; margin-top: 5px; text-shadow: 2px 2px #000; text-align: center; word-break: break-all;">
+                                CPU
+                            </h2>
+                        </div>
+
+                        <!-- P1 PREVIEW (Bottom) -->
+                        <div id="charPreview"
+                            style="width: 150px; height: 140px; pointer-events: none; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.5); border: 2px solid #00ff00;">
+                            <img id="charPreviewUnknown" src="img/logo.png"
+                                style="width: 100%; opacity: 0.5; display: block;">
+
+                            <!-- Dynamic Sprite P1 (Wider) -->
+                            <div id="charPreviewSprite"
+                                style="width: 140px; height: 100px; background-repeat: no-repeat; display: none; image-rendering: pixelated;">
+                            </div>
+                            <h2 id="charPreviewName"
+                                style="color: #00ff00; font-family: 'Press Start 2P'; font-size: 8px; margin-top: 5px; text-shadow: 2px 2px #000; text-align: center; word-break: break-all;">
+                                PLAYER 1
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team 2020 -->
+                <div
+                    style="flex: 1; display: flex; flex-direction: column; align-items: center; border-right: 1px solid #333;">
+                    <h2
+                        style="color: #00ffff; font-family: 'Press Start 2P', cursive; font-size: 14px; margin-bottom: 10px; text-align: center;">
+                        2020 I PRZYJACIELE</h2>
+                    <div id="team2020List" class="char-list-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Team GOSCIE -->
+                <div
+                    style="flex: 1; display: flex; flex-direction: column; align-items: center; border-right: 1px solid #333;">
+                    <h2
+                        style="color: #ff0055; font-family: 'Press Start 2P', cursive; font-size: 14px; margin-bottom: 10px;">
+                        GOSCIE</h2>
+                    <div id="teamGoscieList" class="char-list-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Team OCENIACZE -->
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                    <h2
+                        style="color: #ffff00; font-family: 'Press Start 2P', cursive; font-size: 14px; margin-bottom: 10px;">
+                        OCENIACZE</h2>
+                    <div id="teamOceniaczeList" class="char-list-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .char-list-container {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 5px;
+                    justify-content: center;
+                    align-content: flex-start;
+                    overflow-y: auto;
+                    height: 100%;
+                    width: 100%;
+                    padding-bottom: 10px;
+                }
+
+                /* Hide Scrollbar */
+                .char-list-container::-webkit-scrollbar {
+                    width: 4px;
+                }
+
+                .char-list-container::-webkit-scrollbar-thumb {
+                    background: #555;
+                }
+            </style>
+
+            <div
+                style="margin-top: 5px; color: yellow; font-family: 'Press Start 2P', cursive; font-size: 10px; text-align: center;">
+                P1: WASD+SPACE/C | P2: STRZALKI+ENTER/SHIFT
+            </div>
+            <div id="startButton"
+                style="position: absolute; bottom: 40px; color: #00ff00; border: 4px solid #00ff00; padding: 15px 30px; font-family: 'Press Start 2P', cursive; font-size: 20px; cursor: pointer; display: none; background-color: rgba(0,0,0,0.8); animation: blink 1s infinite;">
+                SELECT MAP (PRESS ENTER)
+            </div>
+            <style>
+                @keyframes blink {
+                    0% {
+                        opacity: 1;
+                    }
+
+                    50% {
+                        opacity: 0.5;
+                    }
+
+                    100% {
+                        opacity: 1;
+                    }
+                }
+            </style>
+        </div>
+
+        <!-- VS SCREEN OVERLAY -->
+        <div id="vsScreen"
+            style="position: absolute; inset: 0; background: black; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center;">
+
+            <h1
+                style="color: yellow; font-family: 'Press Start 2P'; font-size: 60px; margin: 0; text-shadow: 4px 4px red; z-index: 2;">
+                VS</h1>
+
+            <div style="display: flex; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+                <!-- P1 Side -->
+                <div
+                    style="flex: 1; background: linear-gradient(to right, #00ffff 0%, black 100%); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <div id="vsP1Image"
+                        style="width: 100%; height: 100%; background-repeat: no-repeat; filter: drop-shadow(0 0 20px #00ffff); image-rendering: pixelated;">
+                    </div>
+                </div>
+                <!-- P2 Side -->
+                <div
+                    style="flex: 1; background: linear-gradient(to left, #ff0055 0%, black 100%); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <div id="vsP2Image"
+                        style="width: 100%; height: 100%; background-repeat: no-repeat; filter: drop-shadow(0 0 20px #ff0055); transform: scaleX(-1); image-rendering: pixelated;">
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="position: absolute; bottom: 50px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; box-sizing: border-box; z-index: 2;">
+                <h2 id="vsP1Name" style="color: #00ffff; font-family: 'Press Start 2P'; font-size: 24px;">PLAYER 1</h2>
+                <h2 id="vsP2Name" style="color: #ff0055; font-family: 'Press Start 2P'; font-size: 24px;">PLAYER 2</h2>
+            </div>
+        </div>
+
+        <!-- MAIN MENU SCREEN -->
+        <div id="mainMenuScreen"
+            style="position: fixed; inset: 0; background-color: #111; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100;">
+            <h1
+                style="color: white; font-family: 'Press Start 2P'; font-size: 40px; margin-bottom: 40px; text-shadow: 4px 4px #ff0055;">
+                MAIN MENU</h1>
+
+            <div id="mainMenuList" style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                <div class="menu-option" data-index="0"
+                    style="color: white; font-family: 'Press Start 2P'; font-size: 20px; cursor: pointer;">GRACZ VS
+                    GRACZ</div>
+                <div class="menu-option" data-index="1"
+                    style="color: #555; font-family: 'Press Start 2P'; font-size: 20px; cursor: pointer;">GRACZ VS
+                    KOMPUTER</div>
+                <div class="menu-option" data-index="2"
+                    style="color: #555; font-family: 'Press Start 2P'; font-size: 20px; cursor: pointer;">GRACZ VS GRACZ
+                    (ONLINE)</div>
+                <div class="menu-option" data-index="3"
+                    style="color: #555; font-family: 'Press Start 2P'; font-size: 20px; cursor: pointer;">STATYSTYKI
+                </div>
+                <div class="menu-option" data-index="4"
+                    style="color: #555; font-family: 'Press Start 2P'; font-size: 20px; cursor: pointer;">STEROWANIE
+                </div>
+                <div class="menu-option" data-index="5"
+                    style="color: #555; font-family: 'Press Start 2P'; font-size: 20px; cursor: pointer;">DZWIEK: ON
+                </div>
+                <div class="menu-option" data-index="6"
+                    style="color: #555; font-family: 'Press Start 2P'; font-size: 20px; cursor: pointer;">PELNY EKRAN
+                </div>
+            </div>
+
+            <div style="margin-top: 50px; color: yellow; font-family: 'Press Start 2P'; font-size: 12px;">
+                USE W/S TO NAVIGATE - SPACE/ENTER TO SELECT
+            </div>
+        </div>
+
+        <!-- CONTROLS SCREEN OVERLAY -->
+        <div id="controlsScreen"
+            style="position: absolute; inset: 0; background-color: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200; color: white; font-family: 'Press Start 2P';">
+            <h2 style="color: #00ffff; margin-bottom: 30px;">STEROWANIE</h2>
+
+            <div style="display: flex; gap: 60px; margin-bottom: 40px;">
+                <div style="text-align: center;">
+                    <h3 style="color: #ff0055; margin-bottom: 20px;">PLAYER 1</h3>
+                    <p style="margin: 10px 0; font-size: 14px;">W - JUMP</p>
+                    <p style="margin: 10px 0; font-size: 14px;">A - LEFT</p>
+                    <p style="margin: 10px 0; font-size: 14px;">D - RIGHT</p>
+                    <p style="margin: 10px 0; font-size: 14px;">S - BLOCK</p>
+                    <p style="margin: 10px 0; font-size: 14px;">SPACE - PUNCH</p>
+                    <p style="margin: 10px 0; font-size: 14px;">C - KICK</p>
+                    <p style="margin: 10px 0; font-size: 14px; color: orange;">2x SPACE - SUPER</p>
+                </div>
+                <div style="width: 2px; background-color: white;"></div>
+                <div style="text-align: center;">
+                    <h3 style="color: #ff0055; margin-bottom: 20px;">PLAYER 2</h3>
+                    <p style="margin: 10px 0; font-size: 14px;">UP - JUMP</p>
+                    <p style="margin: 10px 0; font-size: 14px;">LEFT - LEFT</p>
+                    <p style="margin: 10px 0; font-size: 14px;">RIGHT - RIGHT</p>
+                    <p style="margin: 10px 0; font-size: 14px;">DOWN - BLOCK</p>
+                    <p style="margin: 10px 0; font-size: 14px;">ENTER - PUNCH</p>
+                    <p style="margin: 10px 0; font-size: 14px;">SHIFT - KICK</p>
+                    <p style="margin: 10px 0; font-size: 14px; color: orange;">2x ENTER - SUPER</p>
+                </div>
+            </div>
+
+            <div id="controlsBackBtn"
+                style="color: yellow; font-size: 12px; cursor: pointer; border: 2px solid yellow; padding: 10px;">
+                PRESS ESCAPE OR BACKSPACE TO RETURN
+            </div>
+        </div>
+
+        <!-- Combo Counter -->
+        <div id="comboCounter"></div>
+
+        <!-- GAME OVER MENU -->
+        <div id="gameOverMenu"
+            style="position: absolute; inset: 0; background-color: rgba(0,0,0,0.85); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200;">
+            <h1 id="gameOverText"
+                style="color: white; font-family: 'Press Start 2P'; font-size: 50px; margin-bottom: 20px; text-shadow: 6px 6px #ff0055;">
+                KONIEC GRY</h1>
+            <div id="gameOverSubtext"
+                style="color: yellow; font-family: 'Press Start 2P'; font-size: 30px; margin-bottom: 50px; text-shadow: 4px 4px red; text-transform: uppercase;">
+                PLAYER 1 WINS</div>
+
+            <div
+                style="color: #00ff00; border: 4px solid #00ff00; padding: 20px; font-family: 'Press Start 2P'; cursor: pointer; animation: blink 1s infinite;">
+                MAIN MENU (PRESS ENTER)
+            </div>
+        </div>
+
+        <!-- ESC Key Exit Confirmation -->
+        <div id="escOverlay"
+            style="position: absolute; inset: 0; background-color: rgba(255, 0, 0, 0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;">
+            <h1
+                style="color: white; font-family: 'Press Start 2P'; font-size: 30px; margin-bottom: 20px; text-align: center; line-height: 1.5;">
+                NACISNIJ ESC<br>ZEBY WYJSC Z GRY
+            </h1>
+        </div>
+
+        <!-- ONLINE MENU (LOBBY) -->
+        <div id="onlineScreen"
+            style="position: absolute; inset: 0; background-color: #1a1a1a; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20;">
+            <h1
+                style="color: #00ffff; font-family: 'Press Start 2P'; margin-bottom: 40px; text-shadow: 0 0 10px #00ffff;">
+                ONLINE LOBBY</h1>
+
+            <div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
+                <!-- HOST -->
+                <div
+                    style="border: 4px solid #00ff00; padding: 30px; text-align: center; background: rgba(0,255,0,0.1);">
+                    <h2 style="color: #00ff00; font-family: 'Press Start 2P'; font-size: 16px; margin-bottom: 20px;">
+                        STWORZ POKOJ</h2>
+                    <button onclick="window.networkManager.createRoom()"
+                        style="padding: 15px 30px; font-family: 'Press Start 2P'; cursor: pointer; background: #00ff00; border: none; font-weight: bold;">
+                        CREATE
+                    </button>
+                    <div id="roomCodeDisplay"
+                        style="margin-top: 20px; color: yellow; font-family: 'Press Start 2P'; font-size: 24px; min-height: 30px;">
+                    </div>
+                </div>
+
+                <!-- JOIN -->
+                <div
+                    style="border: 4px solid #ff0055; padding: 30px; text-align: center; background: rgba(255,0,85,0.1);">
+                    <h2 style="color: #ff0055; font-family: 'Press Start 2P'; font-size: 16px; margin-bottom: 20px;">
+                        DOLACZ</h2>
+                    <input type="text" id="roomCodeInput" placeholder="KOD POKOJU" maxlength="4"
+                        style="padding: 10px; font-family: 'Press Start 2P'; text-transform: uppercase; width: 150px; text-align: center; font-size: 16px;">
+                    <br>
+                    <button
+                        onclick="window.networkManager.joinRoom(document.getElementById('roomCodeInput').value.toUpperCase())"
+                        style="margin-top: 15px; padding: 15px 30px; font-family: 'Press Start 2P'; cursor: pointer; background: #ff0055; color: white; border: none; font-weight: bold;">
+                        JOIN
+                    </button>
+                </div>
+            </div>
+
+            <div id="onlineStatus"
+                style="margin-top: 50px; color: gray; font-family: 'Press Start 2P'; font-size: 10px;">
+                SERVER: DISCONNECTED
+            </div>
+
+            <div onclick="document.getElementById('onlineScreen').style.display='none'; document.getElementById('mainMenuScreen').style.display='flex'; window.mainMenuActive=true;"
+                style="margin-top: 40px; color: yellow; font-family: 'Press Start 2P'; font-size: 12px; cursor: pointer; border: 2px solid yellow; padding: 10px;">
+                BACK TO MENU
+            </div>
+        </div>
+
+        <!-- Map Selection Screen -->
+        <div id="mapSelectionScreen"
+            style="position: absolute; inset: 0; background-color: #202020; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+            <h1 style="color: white; font-family: 'Press Start 2P'; margin-bottom: 40px; text-shadow: 4px 4px #00ffff;">
+                SELECT STAGE</h1>
+            <div id="mapList"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 80%; max-width: 800px; justify-items: center;">
+                <!-- Populated by JS -->
+            </div>
+            <div
+                style="margin-top: 40px; color: yellow; font-family: 'Press Start 2P'; font-size: 12px; text-align: center;">
+                W/S to NAVIGATE - SPACE to SELECT<br><br>PRESS BACKSPACE TO RETURN
+            </div>
+        </div>
+
+        <!-- Statistics Screen (Iceberg) -->
+        <div id="statsScreen">
+            <h1 class="stats-header">RETRO RAP BATTLE ICEBERG</h1>
+            <h2 style="font-size: 10px; color: #ccc; margin-bottom: 10px;">PICK RATE & WIN RATE</h2>
+            <div id="icebergList" class="iceberg-container">
+                <!-- Populated by JS -->
+            </div>
+            <div
+                style="margin-top: 10px; color: yellow; font-family: 'Press Start 2P'; font-size: 10px; text-align: center;">
+                PRESS BACKSPACE TO RETURN
+            </div>
+        </div>
+
+        <!-- Main Game Container -->
+        <div id="gameScreen" style="position: absolute; inset: 0; display: none;">
+
+            <!-- UI Overlay -->
+            <div
+                style="position: absolute; display: flex; width: 100%; align-items: flex-start; padding: 20px; box-sizing: border-box; z-index: 5;">
+
+                <!-- Player 1 Health & Energy -->
+                <div
+                    style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: flex-end;">
+
+                    <!-- Health -->
+                    <div style="position: relative; width: 100%; height: 30px; border: 4px solid white;">
+                        <div style="background-color: red; height: 100%; width: 100%;"></div>
+                        <div id="playerHealth"
+                            style="position: absolute; background-color: #818cf8; top: 0; right: 0; bottom: 0; width: 100%;">
+                        </div>
+                    </div>
+
+                    <!-- Energy -->
+                    <div
+                        style="position: relative; width: 100%; height: 10px; margin-top: 5px; border: 2px solid white; background-color: #222;">
+                        <div id="playerEnergy"
+                            style="position: absolute; top: 0; left: 0; bottom: 0; width: 20%; background-color: orange; transition: width 0.1s, background-color 0.2s;">
+                        </div>
+                    </div>
+
+                    <div id="playerName"
+                        style="position: absolute; top: 55px; left: 0; color: white; font-family: 'Press Start 2P'; font-size: 16px;">
+                        Player 1
+                    </div>
+                    <!-- Pips moved out to avoid innerText overwrite -->
+                    <div id="p1Pips" style="position: absolute; top: 80px; left: 0; display: flex; gap: 5px;">
+                        <div class="round-pip"></div>
+                        <div class="round-pip"></div>
+                    </div>
+                </div>
+
+                <!-- Center: Logo & Timer -->
+                <div
+                    style="display: flex; flex-direction: column; align-items: center; margin: 0 15px; flex-shrink: 0;">
+                    <!-- Logo (Scaled) -->
+                    <img src="img/logo2.png" alt="Logo"
+                        style="width: 80px; height: auto; margin-bottom: 5px; image-rendering: pixelated; filter: drop-shadow(2px 2px 0 #000);">
+
+                    <!-- Timer -->
+                    <div id="timer"
+                        style="background-color: black; width: 60px; height: 40px; display: flex; align-items: center; justify-content: center; color: white; border: 4px solid white; font-family: 'Press Start 2P', cursive; font-size: 16px;">
+                        60
+                    </div>
+                </div>
+
+                <!-- Player 2 Health & Energy -->
+                <div
+                    style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
+
+                    <!-- Health -->
+                    <div style="position: relative; width: 100%; height: 30px; border: 4px solid white;">
+                        <div style="background-color: red; height: 100%; width: 100%;"></div>
+                        <div id="enemyHealth"
+                            style="position: absolute; background-color: #818cf8; top: 0; left: 0; bottom: 0; width: 100%;">
+                        </div>
+                    </div>
+
+                    <!-- Energy -->
+                    <div
+                        style="position: relative; width: 100%; height: 10px; margin-top: 5px; border: 2px solid white; background-color: #222;">
+                        <div id="enemyEnergy"
+                            style="position: absolute; top: 0; left: 0; bottom: 0; width: 20%; background-color: orange; transition: width 0.1s, background-color 0.2s;">
+                        </div>
+                    </div>
+
+                    <div id="enemyName"
+                        style="position: absolute; top: 55px; right: 0; color: white; font-family: 'Press Start 2P'; font-size: 16px;">
+                        Player 2
+                    </div>
+                    <!-- Pips moved out -->
+                    <div id="p2Pips"
+                        style="position: absolute; top: 80px; right: 0; display: flex; gap: 5px; justify-content: flex-end;">
+                        <div class="round-pip"></div>
+                        <div class="round-pip"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Over / Message Display -->
+            <div id="displayText"
+                style="position: absolute; color: white; align-items: center; justify-content: center; top: 0; right: 0; bottom: 0; left: 0; display: none; font-family: 'Press Start 2P', cursive; font-size: 40px; text-shadow: 2px 2px black; z-index: 10;">
+                Tie
+            </div>
+
+            <!-- Round Message Overlay -->
+            <div id="roundOverlay"
+                style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20; pointer-events: none;">
+                <div id="roundMessage" class="retro-fire-text" style="font-size: 80px; text-align: center;">ROUND 1
+                </div>
+                <div id="fightMessage" class="retro-fire-text" style="font-size: 100px; display: none;">FIGHT!</div>
+            </div>
+
+            <canvas></canvas>
+        </div>
+    </div>
+
+    <!-- Mobile Controls (Visible on touch devices or small screens) -->
+    <div id="mobile-controls" style="display: none;">
+        <div id="dpad">
+            <div class="dpad-btn" id="btn-up" data-key="w">▲</div>
+            <div class="dpad-row">
+                <div class="dpad-btn" id="btn-left" data-key="a">◀</div>
+                <div class="dpad-btn" id="btn-down" data-key="s">▼</div>
+                <div class="dpad-btn" id="btn-right" data-key="d">▶</div>
+            </div>
+        </div>
+        <div id="action-buttons">
+            <div class="action-btn" id="btn-kick" data-key="c">KICK (C)</div>
+            <div class="action-btn" id="btn-punch" data-key=" ">PUNCH (SPC)</div>
+        </div>
+    </div>
+
+    <!-- Mobile Toggle Button (Visible always on small screens to re-enable controls if hidden) -->
+    <div id="mobile-toggle"
+        style="position: fixed; top: 10px; right: 10px; z-index: 10001; color: white; border: 2px solid white; padding: 5px; font-family: 'Press Start 2P'; font-size: 10px; background: rgba(0,0,0,0.5); cursor: pointer; display: none;">
+        PAD
+    </div>
+
+    <!-- Scaling Script -->
+    <script>
+        function resizeGame() {
+            const container = document.getElementById('game-container');
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const targetAspect = 1024 / 576;
+            const windowAspect = windowWidth / windowHeight;
+
+            let scale;
+            if (windowAspect > targetAspect) {
+                // Window is wider than game -> limit by height
+                scale = windowHeight / 576;
+            } else {
+                // Window is narrower -> limit by width
+                scale = windowWidth / 1024;
+            }
+
+            container.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            container.style.left = '50%';
+            container.style.top = '50%';
+            container.style.position = 'absolute';
+        }
+
+        window.addEventListener('resize', resizeGame);
+        window.addEventListener('load', resizeGame);
+        // Initial call
+        resizeGame();
+    </script>
+
+    <!-- ONLINE -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="js/managers/NetworkManager.js?v=41"></script>
+
+    <script src="js/utils.js?v=39"></script>
+    <script src="js/classes/Sprite.js?v=39"></script>
+    <script src="js/classes/particle.js?v=39"></script>
+    <script src="js/classes/floatingtext.js?v=39"></script>
+    <script src="js/classes/Fighter.js?v=39"></script>
+    <script src="js/classes/AudioManager.js?v=39"></script>
+    <script src="js/data/roster.js?v=39"></script>
+    <script src="js/data/rap_quotes.js?v=39"></script>
+    <script src="js/managers/StatsManager.js?v=39"></script>
+    <script src="js/effects.js?v=39"></script>
+    <script src="js/main.js?v=39"></script>
+</body>
+
+</html>

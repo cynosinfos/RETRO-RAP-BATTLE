@@ -1,0 +1,65 @@
+PLAN WDROŻENIA TRYBU ONLINE DO GRY "2020 FIGHTERS"
+
+CEL: Umożliwienie gry przez internet w dwóch trybach:
+A. ZAPROSZENIE (INVITE): Grasz ze znajomym (np. wysyłasz mu kod pokoju).
+B. LOSOWY PRZECIWNIK (RANDOM MATCHMAKING): Serwer paruje dwóch chętnych graczy.
+
+TECHNOLOGIA:
+Zalecana technologia to Node.js (serwer) + Socket.io (komunikacja w czasie rzeczywistym). Jest to standard dla gier przeglądarkowych JS.
+
+==================================================
+KROK 1: PRZYGOTOWANIE ŚRODOWISKA (TWOJA ROLA)
+==================================================
+1. Zainstaluj Node.js na swoim komputerze (jeśli nie masz).
+2. W folderze projektu utwórz nowy podfolder `server`.
+3. Otwórz terminal w folderze `server` i wpisz:
+   `npm init -y` (tworzy plik package.json)
+   `npm install express socket.io` (instaluje biblioteki sieciowe)
+
+==================================================
+KROK 2: BUDOWA SERWERA (MOJA ROLA - KODOWANIE)
+==================================================
+Stworzę plik `server/index.js`, który będzie zarządzał graczami.
+
+Logika serwera będzie wyglądać tak:
+1. Przechowujemy listę aktywnych pokoi (Rooms).
+2. Obsługa `connection`: Gdy gracz wchodzi.
+3. Obsługa `createGame`: Gracz tworzy pokój prywatny -> dostaje KOD (np. "XJ92").
+4. Obsługa `joinGame(code)`: Drugi gracz wpisuje kod -> serwer ich łączy.
+5. Obsługa `findMatch`: Gracz klika "Losowy Przeciwnik" -> serwer dodaje go do kolejki i jeśli ktoś już tam jest, tworzy im pokój.
+6. Obsługa `inputData`: Przesyłanie wciśniętych klawiszy (nie całej pozycji!). 
+   *Ważne:* Żeby uniknąć lagów, najlepiej przesyłać tylko INPUTY (wciśnięto "A", puszczono "W"), a gra u obu graczy symuluje ruch. Ewentualnie co jakiś czas synchronizacja pozycji (x,y).
+
+==================================================
+KROK 3: ZMIANY W KLIENCIE GRY (MOJA ROLA)
+==================================================
+Muszę zmodyfikować `index.html` i `main.js`.
+
+1. Dodanie biblioteki klienta: `<script src="/socket.io/socket.io.js"></script>`.
+2. Nowe menu w grze po wybraniu "ONLINE":
+   - Przycisk "STWÓRZ POKÓJ" (wyświetla kod).
+   - Pole "WPISZ KOD" + przycisk "DOŁĄCZ".
+   - Przycisk "LOSOWY PRZECIWNIK".
+3. Logika sterowania `main.js`:
+   - Jeśli tryb = ONLINE, to `keydown` wysyła sygnał do serwera.
+   - Nasłuchiwanie sygnałów od przeciwnika: Jeśli serwer przyśle "Enemy pressed Jump", Twoja gra wykonuje skok przeciwnika.
+
+==================================================
+KROK 4: PUBLIKACJA W SIECI (WSPÓLNA ROLA)
+==================================================
+Żeby grać z kimś z innego domu, serwer musi być w internecie (lokalnie zadziała tylko w Twojej sieci Wi-Fi).
+
+1. Wybór hostingu: Polecam **Render.com** lub **Heroku** (darmowe pakiety startowe wystarczą na prostą grę).
+2. Wrzucenie plików serwera na GitHub.
+3. Podpięcie GitHuba pod Render/Heroku -> Serwer działa 24/7 pod adresem np. `2020fighters.onrender.com`.
+4. W grze zmieniamy adres łączenia z `localhost` na `2020fighters.onrender.com`.
+
+==================================================
+PODSUMOWANIE KOSZTÓW I WYMAGAŃ
+==================================================
+- Koszt: 0 zł (Node.js open source, hosting darmowy w planach free).
+- Czas pracy:
+  - Podstawowy multiplayer (ruch): ok. 1-2 dni pracy (mojej, przy Twoim nadworze).
+  - Synchronizacja ciosów i HP: kolejne 1-2 dni (debugowanie lagów).
+
+Ten plan jest gotowy do realizacji, gdy tylko zdecydujesz się ruszyć z punktem 5!

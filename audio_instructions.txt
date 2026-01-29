@@ -1,0 +1,28 @@
+INSTRUKCJA DODAWANIA DZWIĘKÓW
+=========================================
+
+Aby gra miała dźwięk, musisz stworzyć folder "audio" w głównym katalogu gry (tam gdzie jest index.html) i wrzucić do niego pliki o KONKRETNYCH nazwach.
+
+1. STWÓRZ FOLDER:
+   Nazwa: audio
+
+2. WRZUĆ PLIKI MUZYCZNE (MP3):
+   - music_menu.mp3   (Muzyka w menu głównym)
+   - music_fight.mp3  (Muzyka podczas walki)
+
+3. WRZUĆ EFEKTY DŹWIĘKOWE (WAV lub MP3):
+   - hit.mp3          (Odgłos uderzenia)
+   - attack.mp3       (Odgłos machnięcia ręką/ciosem)
+   - jump.mp3         (Odgłos skoku)
+
+4. WRZUĆ GŁOS LEKTORA (WAV lub MP3):
+   - round1.mp3       (Lektor: "Round One")
+   - fight.mp3        (Lektor: "Fight!")
+   - ko.mp3           (Lektor: "K.O.")
+   - p1_wins.mp3      (Lektor: "Player 1 Wins")
+   - p2_wins.mp3      (Lektor: "Player 2 Wins")
+
+WAŻNE:
+- Wielkość liter ma znaczenie (używaj małych liter).
+- Jeśli brakuje pliku, gra po prostu nie odtworzy dźwięku (nie powinna się zepsuć).
+- Po dodaniu plików odśwież grę.

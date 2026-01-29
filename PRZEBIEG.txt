@@ -1,0 +1,124 @@
+PRZEBIEG SESJI - 29.01.2026 - Naprawy VS Screen, AI, Audio i Deployment
+
+GLOWNE CELE ZREALIZOWANE:
+
+1. POPRAWKI NAZWY POSTACI
+- Zmieniono PATKUSTOMS na PAT KUSTOMS w main.js (linia 52)
+- Dodano definicje PAT KUSTOMS w roster.js wskazujaca na patkustoms_500.png
+
+2. NAPRAWIONO AI - KOMPUTER NIE ATAKUJE PRZED STARTEM RUNDY
+- Dodano window.isRoundActive = false na poczatku startGame() (linia 650)
+- Dodano if (!window.isRoundActive) return w updateAI() (linia 1521)
+- Dodano zabezpieczenie try-catch wokol updateAI() w petli animate (linia 1255-1260)
+
+3. SEKWENCYJNY WYBOR POSTACI (MOBILE/SINGLE CONTROLLER)
+Problem: Na telefonie/jednym kontrolerze nie dalo sie wybrac P2 po P1
+Rozwiazanie: (linie 450-521 w main.js)
+- W trybie PVE: CPU mozna wybrac dopiero PO zatwierdzeniu P1 (p1Confirmed && !p2Confirmed)
+- W trybie PVP: P2 mozna wybrac dopiero PO zatwierdzeniu P1
+- Dodano obsluge WASD + Spacja dla P2/CPU (wczesniej tylko strzalki)
+- Dodano return po zatwierdzeniu P1, aby zapobiec natychmiastowemu zatwierdzeniu P2
+
+4. WYBOR MAPY PRZYCISKIEM KICK NA MOBILE
+- Dodano obsluge klawisza 'c' (KICK) i 'Enter' do zatwierdzania mapy (linia 579)
+- Wczesniej tylko Spacja dzialala
+
+5. NAPRAWIONO BLEDY DEPLOYMENT NA SERWERZE
+
+A) Problem z wielkoscia liter (case-sensitivity Linux)
+Blad: Particle is not defined, FloatingText is not defined
+Przyczyna: Serwer Linux rozroznia wielkosc liter, a pliki byly:
+- W index.html: Particle.js, FloatingText.js (wielkie litery)
+- Na dysku: particle.js, floatingtext.js (male litery)
+
+Rozwiazanie: (linia 619-620 w index.html)
+<script src="js/classes/particle.js?v=35"></script>
+<script src="js/classes/floatingtext.js?v=35"></script>
+
+B) Uszkodzony plik utils.js
+Blad: Syntax errors w utils.js linia 148+
+Przyczyna: Plik zawieral duplikat klasy Particle z kodowaniem UTF-16 (null bytes)
+Rozwiazanie: Nadpisano caly utils.js czysta wersja (Step 999)
+
+C) Wersjonowanie cache
+Problem: Przegladarka ladowala stare pliki mimo zmian
+Rozwiazanie: Podniesiono wszystkie wersje do v=35 w index.html (linie 617-628)
+
+D) Problem z Total Commander
+Odkrycie: Total Commander konwertowal nazwy plikow na male litery podczas FTP upload
+Rozwiazanie: Wylaczyc opcje Convert to lowercase w ustawieniach FTP TC lub uzyc FileZilla/WinSCP
+
+6. ZABEZPIECZENIA AUDIO (BACKWARD COMPATIBILITY)
+Problem: audioManager.playMusic/playNav/etc is not a function
+Przyczyna: Stary AudioManager.js na serwerze nie mial nowych metod
+
+Rozwiazanie: Dodano funkcje pomocnicza safeAudio() (linia 68-72 w main.js)
+
+Zamieniono WSZYSTKIE wywolania audioManager.XXX() na safeAudio('XXX')
+
+PLIKI ZMODYFIKOWANE:
+
+1. index.html
+- Dodano komentarz identyfikujacy
+- Zmieniono Particle.js na particle.js
+- Zmieniono FloatingText.js na floatingtext.js
+- Podniesiono wszystkie wersje do v=35
+
+2. js/main.js
+- Dodano window.isRoundActive = false w startGame()
+- Dodano funkcje safeAudio(method, ...args)
+- Zamieniono wszystkie wywolania audioManager na safeAudio
+- Poprawiono sekwencyjny wybor postaci (PVE i PVP)
+- Dodano obsluge WASD dla P2/CPU
+- Dodano obsluge 'c' i 'Enter' dla wyboru mapy
+- Dodano zabezpieczenie try-catch dla updateAI
+- Zmieniono PATKUSTOMS na PAT KUSTOMS
+
+3. js/data/roster.js
+- Dodano definicje dla PAT KUSTOMS
+
+4. js/utils.js
+- Nadpisano caly plik (usunieto uszkodzone dane UTF-16)
+
+PLIKI DO UPLOADU NA SERWER (POPRAWNE NAZWY!):
+
+WAZNE: Nazwy plikow musza byc DOKLADNIE takie (wielkosc liter ma znaczenie na Linux):
+
+index.html
+js/main.js
+js/utils.js
+js/data/roster.js
+js/classes/Sprite.js          (wielka S)
+js/classes/Fighter.js         (wielka F)
+js/classes/AudioManager.js    (wielkie A i M)
+js/classes/particle.js        (male litery)
+js/classes/floatingtext.js    (male litery)
+
+INSTRUKCJE DEPLOYMENT:
+
+1. Wylacz konwersje nazw w Total Commander:
+   - FTP → Connection → FTP Connection Settings
+   - Odznacz Send files in lowercase / Convert names to lowercase
+
+2. LUB uzyj FileZilla/WinSCP (zachowuja oryginalne nazwy)
+
+3. Upload plikow z folderu:
+   C:\Users\Dziubasek\.gemini\antigravity\scratch\fighting_game\
+
+4. Wyczysc cache przegladarki:
+   - Ctrl + Shift + R (hard refresh)
+   - LUB otworz w trybie incognito
+
+5. Sprawdz czy pliki audio istnieja na serwerze w folderze audio/
+
+LOKALIZACJA PLIKOW:
+
+Folder projektu:
+C:\Users\Dziubasek\.gemini\antigravity\scratch\fighting_game\
+
+Poprawny index.html:
+C:\Users\Dziubasek\.gemini\antigravity\scratch\fighting_game\index.html
+
+Data zapisu: 29.01.2026, 19:04
+Status: WSZYSTKIE POPRAWKI ZAIMPLEMENTOWANE
+Gotowe do: Upload na serwer + Planowanie nowych features
