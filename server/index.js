@@ -17,6 +17,7 @@ app.use(express.static(path.join(__dirname, '../')))
 
 // Game State
 const rooms = {}
+const matchmakingQueue = []
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id)
@@ -66,8 +67,66 @@ io.on('connection', (socket) => {
     // 4. Disconnect
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id)
-        // Cleanup rooms... (Simplified for now)
+
+        // Remove from Queue if waiting
+        const index = matchmakingQueue.indexOf(socket.id);
+        if (index > -1) {
+            matchmakingQueue.splice(index, 1);
+        }
+
+        // Update Global Count
+        io.emit('playerCountUpdate', io.engine.clientsCount)
     })
+
+    // 5. Quick Match (Matchmaking)
+    socket.on('findMatch', () => {
+        console.log('User searching for match:', socket.id)
+
+        // If already in queue, ignore
+        if (matchmakingQueue.includes(socket.id)) return
+
+        if (matchmakingQueue.length > 0) {
+            // Found an opponent!
+            const opponentId = matchmakingQueue.shift()
+
+            // Create a room for them
+            const roomId = "QUICK_" + Math.random().toString(36).substring(2, 6).toUpperCase()
+            rooms[roomId] = {
+                players: [opponentId, socket.id]
+            }
+
+            // Move sockets to room
+            const opponentSocket = io.sockets.sockets.get(opponentId)
+            if (opponentSocket) {
+                opponentSocket.join(roomId)
+                socket.join(roomId)
+
+                // Notify P1 (Opponent)
+                io.to(opponentId).emit('matchFound', {
+                    roomId: roomId,
+                    playerIndex: 0
+                })
+
+                // Notify P2 (Me)
+                socket.emit('matchFound', {
+                    roomId: roomId,
+                    playerIndex: 1
+                })
+
+                console.log(`Match found: ${opponentId} vs ${socket.id} in ${roomId}`)
+            } else {
+                // Opponent disconnected while waiting? Add myself to queue instead.
+                matchmakingQueue.push(socket.id)
+            }
+        } else {
+            // No one waiting, join queue
+            matchmakingQueue.push(socket.id)
+            console.log('Added to queue:', socket.id)
+        }
+    })
+
+    // Initial Count Check
+    io.emit('playerCountUpdate', io.engine.clientsCount)
 })
 
 const PORT = process.env.PORT || 3000
