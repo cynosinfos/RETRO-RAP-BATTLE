@@ -18,7 +18,12 @@ app.use(express.static(path.join(__dirname, '../')))
 
 // Game State
 const rooms = {}
-const matchmakingQueue = []
+const matchmakingQueue = {
+    desktop: [],
+    mobile: []
+}
+
+
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id)
@@ -70,9 +75,12 @@ io.on('connection', (socket) => {
         console.log('User disconnected:', socket.id)
 
         // Remove from Queue if waiting
-        const index = matchmakingQueue.indexOf(socket.id);
-        if (index > -1) {
-            matchmakingQueue.splice(index, 1);
+        for (const type in matchmakingQueue) {
+            const index = matchmakingQueue[type].indexOf(socket.id);
+            if (index > -1) {
+                matchmakingQueue[type].splice(index, 1);
+                break;
+            }
         }
 
         // Update Global Count
@@ -80,15 +88,18 @@ io.on('connection', (socket) => {
     })
 
     // 5. Quick Match (Matchmaking)
-    socket.on('findMatch', () => {
-        console.log('User searching for match:', socket.id)
+    socket.on('findMatch', (data) => {
+        const device = (data && data.device === 'mobile') ? 'mobile' : 'desktop';
+        console.log(`User searching for match (${device}):`, socket.id)
+
+        const targetQueue = matchmakingQueue[device];
 
         // If already in queue, ignore
-        if (matchmakingQueue.includes(socket.id)) return
+        if (targetQueue.includes(socket.id)) return
 
-        if (matchmakingQueue.length > 0) {
+        if (targetQueue.length > 0) {
             // Found an opponent!
-            const opponentId = matchmakingQueue.shift()
+            const opponentId = targetQueue.shift()
 
             // Create a room for them
             const roomId = "QUICK_" + Math.random().toString(36).substring(2, 6).toUpperCase()
@@ -114,15 +125,15 @@ io.on('connection', (socket) => {
                     playerIndex: 1
                 })
 
-                console.log(`Match found: ${opponentId} vs ${socket.id} in ${roomId}`)
+                console.log(`Match found (${device}): ${opponentId} vs ${socket.id} in ${roomId}`)
             } else {
                 // Opponent disconnected while waiting? Add myself to queue instead.
-                matchmakingQueue.push(socket.id)
+                targetQueue.push(socket.id)
             }
         } else {
             // No one waiting, join queue
-            matchmakingQueue.push(socket.id)
-            console.log('Added to queue:', socket.id)
+            targetQueue.push(socket.id)
+            console.log(`Added to queue (${device}):`, socket.id)
         }
     })
 
