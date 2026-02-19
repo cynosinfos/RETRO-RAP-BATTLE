@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fighter-v2-nav-ui-fix';
+const CACHE_NAME = 'fighter-v2.1-update-fix';
 const ASSETS = [
   './',
   './index.html',
