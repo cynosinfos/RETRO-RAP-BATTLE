@@ -83,6 +83,11 @@ io.on('connection', (socket) => {
                 // Notify everyone in room about the new joiner
                 io.to(roomId).emit('playerJoined', { roomId, playerId: socket.id, playerIndex: emptyIndex });
 
+                // FIX: If 2nd player joined, notify others (Host) that we can start
+                if (emptyIndex === 1) {
+                    socket.to(roomId).emit('gameReady');
+                }
+
                 // ALSO: Send current room state to the new joiner so they know who is already there
                 const existingPlayers = room.players.map((pid, idx) => ({ idx, pid })).filter(p => p.pid !== null && p.pid !== socket.id);
                 existingPlayers.forEach(p => {
