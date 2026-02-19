@@ -1,0 +1,1721 @@
+<!-- POPRAWNY PLIK - WERSJA 52 - EDYTOWANY PRZEZ AI -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Fighting Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=55">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(err => console.log('SW failed', err));
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <!-- News Ticker (Global) -->
+    <div id="newsTickerBar" style="display: none;">
+        <div id="newsClock">00:00</div>
+        <div id="newsContent">LADOWANIE RAP NEWS...</div>
+    </div>
+
+    <!-- Error Console (Hidden by default) -->
+    <div id="error-console"
+        style="position: fixed; top: 0; left: 0; width: 100%; background: rgba(255,0,0,0.8); color: white; z-index: 9999; font-family: monospace; padding: 10px; display: none; pointer-events: none;">
+    </div>
+    <script>
+        window.onerror = function (message, source, lineno, colno, error) {
+            const consoleDiv = document.getElementById('error-console');
+            consoleDiv.style.display = 'block';
+            consoleDiv.innerHTML += `<div>Error: ${message} at ${source}:${lineno}</div>`;
+        };
+    </script>
+
+    <!-- Global ESC Button -->
+    <div id="globalEscBtn"
+        style="position: fixed; top: 50px; left: 10px; z-index: 9999; color: white; border: 2px solid white; padding: 5px 10px; font-family: 'Press Start 2P'; font-size: 10px; cursor: pointer; display: none; background-color: rgba(0,0,0,0.5);">
+        ESC
+    </div>
+
+    <!-- INTRO SEQUENCE -->
+    <div id="introScreen"
+        style="position: fixed; inset: 0; background-color: #000; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+        <!-- NEW LOGO -->
+        <img src="img/logo.png" alt="RETRO RAP BATTLE"
+            style="width: 600px; image-rendering: pixelated; margin-bottom: 20px;">
+        <div id="startText"
+            style="margin-top: 50px; color: #00ffff; font-family: 'Press Start 2P'; animation: blink 1s infinite;">
+            WRZUC MONETE LUB NACISNIJ ABY ROZPOCZAC</div>
+
+        <!-- AUTH BUTTONS -->
+        <div style="position: absolute; top: 40px; right: 20px; display: flex; gap: 15px; z-index: 200;">
+            <div id="btnLogin" onclick="event.stopPropagation(); showLoginModal()" class="auth-btn"
+                style="color: #00ff00; border: 2px solid #00ff00;">LOGIN</div>
+            <div id="btnRegister" onclick="event.stopPropagation(); showRegisterModal()" class="auth-btn"
+                style="color: #ff0055; border: 2px solid #ff0055;">REGISTER</div>
+        </div>
+
+        <style>
+            .auth-btn {
+                font-family: 'Press Start 2P';
+                font-size: 12px;
+                padding: 10px 15px;
+                cursor: pointer;
+                background: rgba(0, 0, 0, 0.8);
+                text-transform: uppercase;
+            }
+
+            .auth-btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+                box-shadow: 0 0 10px white;
+            }
+        </style>
+
+        <!-- AUTH MODAL -->
+        <div id="authModal"
+            style="position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; color: white;">
+            <h1 id="authTitle" style="font-family: 'Press Start 2P'; color: #00ffff; margin-bottom: 20px;">LOGIN</h1>
+
+            <input id="authLogin" type="text" placeholder="LOGIN"
+                style="margin: 10px; padding: 10px; font-family: 'Press Start 2P'; border: 2px solid white; background: black; color: white; text-transform: uppercase;">
+            <input id="authPass" type="password" placeholder="HASLO"
+                style="margin: 10px; padding: 10px; font-family: 'Press Start 2P'; border: 2px solid white; background: black; color: white;">
+
+            <div id="authWarn"
+                style="color: red; font-family: 'Press Start 2P'; font-size: 10px; margin: 10px; display: none;"></div>
+
+            <div style="display: flex; gap: 20px; margin-top: 20px;">
+                <button onclick="handleAuthSubmit()"
+                    style="padding: 15px 30px; font-family: 'Press Start 2P'; cursor: pointer; background: #00ff00; border: none;">ZATWIERDZ</button>
+                <button onclick="closeAuthModal()"
+                    style="padding: 15px 30px; font-family: 'Press Start 2P'; cursor: pointer; background: #555; color: #aaa; border: none;">ANULUJ</button>
+            </div>
+
+            <div
+                style="margin-top: 30px; font-size: 8px; color: gray; max-width: 400px; text-align: center; font-family: 'Press Start 2P'; line-height: 1.5;">
+                REJESTRACJA TYLKO NA HASŁO I LOGIN, BEZ EMAILA. TA STRONA NIE ZBIERA TWOICH DANYCH, DLATEGO ZAPAMIETAJ
+                LOGIN I HASLO BO NIE MA OPCJI ODZYSKANIA.
+            </div>
+        </div>
+
+        <!-- DISCLAIMER -->
+        <div
+            style="margin-top: 60px; max-width: 800px; text-align: center; color: white; font-family: 'Press Start 2P', cursive; font-size: 10px; line-height: 1.6; padding: 0 20px;">
+            GRA STWORZONA W CELACH HUMORYSTYCZNYCH ABY WYJSC NA PRZECIW FANOW POLSKIEGO RAPU ZEBY MOGLI SAMI ROZLADOWAC
+            EMOCJE I ROZWIAZAC KONFLIKTY KTORE WIECZNIE POTEGUJA W SOCIAL MEDIACH. TWORCA NIE MA ZAMIARU NIKOGO OBRAZIC
+            ANI ZARABIAC NA GRZE RACZEJ TYLKO WLOZYC W NIA SWOJ CZAS. JEZELI KTOS CZUJE SIE URAZONY PROSZE O KONTAKT NA
+            EMAIL <span style="font-weight: bold; color: red;">CYNOS.INFOS@GMAIL.COM</span> I POSTAĆ ZOSTANIE USUNIETA.
+        </div>
+    </div>
+
+    <div id="playerMenuScreen"
+        style="display: none; position: fixed; inset: 0; background-image: url('img/background/background_warsaw_street.png'); background-size: cover; background-position: center; z-index: 150;">
+        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.8);"></div>
+
+        <div style="position: relative; z-index: 10; display: flex; height: 100%;">
+
+            <!-- LEFT MENU -->
+            <div
+                style="width: 300px; background: rgba(0,0,0,0.9); border-right: 2px solid #333; display: flex; flex-direction: column; padding: 40px 20px;">
+                <h1 style="color: white; font-size: 20px; margin-bottom: 10px; font-family: 'Press Start 2P';">WITAJ
+                </h1>
+                <h2 id="playerNick"
+                    style="color: #00ffff; font-size: 24px; margin-bottom: 5px; font-family: 'Press Start 2P';">PLAYER
+                </h2>
+                <div id="playerMoney"
+                    style="color: #00ff00; font-size: 16px; margin-bottom: 40px; font-family: 'Press Start 2P';">0 MK
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <button onclick="showMap()"
+                        style="padding: 15px; background: linear-gradient(90deg, #ffaa00, #ffaa00); border: 2px solid #fff; color: black; font-family: 'Press Start 2P'; cursor: pointer; text-align: left;">🗺️
+                        MAPA POLSKI</button>
+                    <button onclick="quickFight()"
+                        style="padding: 15px; background: #333; border: 2px solid #00ff00; color: #00ff00; font-family: 'Press Start 2P'; cursor: pointer; text-align: left;">⚔️
+                        SZYBKA WALKA</button>
+                    <button onclick="openInventory()"
+                        style="padding: 15px; background: #333; border: 2px solid #ffff00; color: #ffff00; font-family: 'Press Start 2P'; cursor: pointer; text-align: left;">🎧
+                        POKÓJ</button>
+                    <button onclick="openStats()"
+                        style="padding: 15px; background: #333; border: 2px solid #00ffff; color: #00ffff; font-family: 'Press Start 2P'; cursor: pointer; text-align: left;">📊
+                        STATYSTYKI</button>
+                    <a href="collection.html"
+                        style="padding: 15px; background: #333; border: 2px solid #ff00ff; color: #ff00ff; font-family: 'Press Start 2P'; cursor: pointer; text-align: left; text-decoration: none; font-size: 13px;">🎴
+                        KOLEKCJA</a>
+                    <a href="achievements.html"
+                        style="padding: 15px; background: #333; border: 2px solid #FFD700; color: #FFD700; font-family: 'Press Start 2P'; cursor: pointer; text-align: left; text-decoration: none; font-size: 13px;">🏆
+                        ACHIEVEMENTY</a>
+                    <button onclick="returnToMainMenu()"
+                        style="padding: 15px; background: #333; border: 2px solid #ff0055; color: #ff0055; font-family: 'Press Start 2P'; cursor: pointer; text-align: left; margin-top: 20px;">🛑
+                        WYLOGUJ</button>
+                </div>
+            </div>
+
+            <!-- RIGHT CONTENT (Dynamic Views) -->
+            <div id="dashboardContent" style="flex: 1; position: relative; overflow: hidden;">
+
+                <!-- VIEW 1: NEWS (Default) -->
+                <div id="viewNews" style="padding: 40px; color: white; font-family: 'Press Start 2P'; display: block;">
+                    <h2 style="color: #888; margin-bottom: 20px;">NEWSY Z MIASTA</h2>
+                    <div
+                        style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; line-height: 1.6; font-size: 12px;">
+                        <p style="margin-bottom: 10px; color: #00ff00;">> TURNIEJ WARSZAWSKI ROZPOCZĘTY!</p>
+                        <p style="margin-bottom: 10px;">> Nowe płyty w empiku.</p>
+                        <p>> Dymy na instagramie.</p>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: POLAND MAP -->
+                <div id="viewMap"
+                    style="display: none; width: 100%; height: 100%; position: relative; background-color: #111;">
+                    <div id="mapContainer"
+                        style="width: 100%; height: 100%; background-image: url('img/poland_map.png'); background-size: contain; background-repeat: no-repeat; background-position: center;">
+                        <!-- PINS injected by JS -->
+                    </div>
+                    <!-- Map UI Overlay -->
+                    <div
+                        style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid #555; font-size: 10px; font-family: 'Press Start 2P'; color: white;">
+                        <div>STAMINA: <span id="mapStamina">100</span>%</div>
+                        <div style="margin-top:5px;">LOKACJA: <span id="mapLocation" style="color:#00ffff;">WAW</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 3: CITY STREET (Warsaw etc) -->
+                <div id="viewCity"
+                    style="display: none; width: 100%; height: 100%; position: relative; background-image: url('img/background/background_warsaw_street.png'); background-size: cover; background-position: center;">
+
+                    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.3);"></div>
+
+                    <button onclick="showMap()"
+                        style="position: absolute; top: 20px; left: 20px; padding: 10px; background: #ff0055; color: white; border: 2px solid white; font-family: 'Press Start 2P'; cursor: pointer; z-index: 10;">
+                        ⬅ POWRÓT NA MAPĘ
+                    </button>
+
+                    <!-- CITY INTERACTIVE ZONES (Placeholders) -->
+                    <!-- SKLEP -->
+                    <div onclick="alert('SKLEP OTWARTY WKRÓTCE!')"
+                        style="position: absolute; top: 50%; left: 10%; width: 150px; height: 150px; border: 2px dashed #ffff00; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);">
+                        <div
+                            style="color: #ffff00; font-family: 'Press Start 2P'; font-size: 12px; text-shadow: 2px 2px 0 #000;">
+                            SKLEP</div>
+                    </div>
+
+                    <!-- TURNIEJ -->
+                    <div onclick="quickFight()"
+                        style="position: absolute; top: 40%; left: 70%; width: 150px; height: 200px; border: 2px dashed #ff0055; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);">
+                        <div
+                            style="color: #ff0055; font-family: 'Press Start 2P'; font-size: 12px; text-shadow: 2px 2px 0 #000;">
+                            TURNIEJ</div>
+                    </div>
+
+                    <!-- HOTEL -->
+                    <div onclick="restoreStamina()"
+                        style="position: absolute; top: 20%; left: 40%; width: 100px; height: 100px; border: 2px dashed #00ffff; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);">
+                        <div
+                            style="color: #00ffff; font-family: 'Press Start 2P'; font-size: 10px; text-shadow: 2px 2px 0 #000;">
+                            HOTEL</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PROFILE UI (Top Right) -->
+            <div id="profileDisplay" onclick="openProfileModal()"
+                style="position: fixed; top: 100px; right: 20px; z-index: 1000; cursor: pointer; color: white; font-family: 'Press Start 2P'; font-size: 10px; border: 2px solid #555; padding: 10px; background: rgba(0,0,0,0.8);">
+                PROFIL: DEFAULT
+            </div>
+
+            <!-- PROFILE MODAL -->
+            <div id="profileModal"
+                style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Press Start 2P';">
+                <h2 style="color: #00ffff; margin-bottom: 20px;">ZARZADZANIE PROFILEM</h2>
+
+                <div style="display: flex; gap: 40px;">
+                    <!-- LEFT: LIST -->
+                    <div style="width: 300px; border-right: 1px solid #555; padding-right: 20px;">
+                        <h3 style="color: yellow; font-size: 12px; margin-bottom: 15px;">DOSTEPNE PROFILE:</h3>
+                        <div id="profileList" style="display: flex; flex-direction: column; gap: 10px;">
+                            <!-- JS Populated -->
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: CREATE -->
+                    <div style="width: 300px; padding-left: 20px;">
+                        <h3 style="color: #00ff00; font-size: 12px; margin-bottom: 15px;">UTWORZ NOWY:</h3>
+
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-size: 10px;">NAZWA:</label><br>
+                            <input id="newProfileName" type="text" maxlength="12"
+                                style="background: #333; color: white; border: 1px solid #555; padding: 5px; font-family: 'Press Start 2P'; width: 100%; margin-top: 5px;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="font-size: 10px; color: #ff0055;">
+                                <input id="adminCheckbox" type="checkbox" onchange="toggleAdminPass()"> TRYB ADMINA
+                            </label>
+                            <div id="adminPassField" style="display: none; margin-top: 5px;">
+                                <input id="adminPassInput" type="password" placeholder="HASLO ADMINA"
+                                    style="background: #333; color: white; border: 1px solid #ff0055; padding: 5px; font-family: 'Press Start 2P'; width: 100%;">
+                            </div>
+                        </div>
+
+                        <button onclick="createNewProfileUI()"
+                            style="background: #00ff00; color: black; border: none; padding: 10px; cursor: pointer; font-family: 'Press Start 2P'; width: 100%;">UTWORZ</button>
+                    </div>
+                </div>
+
+                <button onclick="document.getElementById('profileModal').style.display='none'"
+                    style="margin-top: 40px; background: #555; color: white; border: none; padding: 10px 30px; cursor: pointer; font-family: 'Press Start 2P';">
+                    ZAMKNIJ
+                </button>
+            </div>
+
+            <!-- Load Managers -->
+            <script src="js/data/items.js"></script>
+            <script src="js/InventoryManager.js"></script>
+            <script>
+                // Init Managers Global
+                window.addEventListener('load', () => {
+                    // Collection Manager Init
+                    if (typeof CollectionManager !== 'undefined') {
+                        window.collectionManager = new CollectionManager();
+                    }
+                    // Inventory Manager Init
+                    if (typeof InventoryManager !== 'undefined') {
+                        window.inventoryManager = new InventoryManager();
+                    }
+                });
+            </script>
+
+            <!-- Intro Styles & Script -->
+            <style>
+                .graffiti-logo {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 0px;
+                    transform: rotate(-5deg);
+                    /* Slight graffiti tilt */
+                }
+
+                .graffiti-line {
+                    font-family: 'Permanent Marker', cursive;
+                    font-size: 100px;
+                    /* Bigger size */
+                    line-height: 0.9;
+                }
+
+                .neon-blue {
+                    color: #00ffff;
+                    text-shadow: 4px 4px 0px #000, 8px 8px 0px #008b8b;
+                }
+
+                .neon-pink {
+                    color: #ff0055;
+                    text-shadow: 4px 4px 0px #000, 8px 8px 0px #8b0000;
+                    margin-left: 40px;
+                    /* Slanted alignment effect */
+                }
+
+                .neon-green {
+                    color: #00ff00;
+                    text-shadow: 4px 4px 0px #000, 8px 8px 0px #006400;
+                    margin-left: -20px;
+                }
+
+                .neon-text {
+                    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 40px #00ffff;
+                    animation: flicker 2s infinite alternate;
+                }
+
+                .neon-text-pink {
+                    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #ff0055, 0 0 30px #ff0055, 0 0 40px #ff0055;
+                    animation: flicker 2.5s infinite alternate;
+                }
+
+                @keyframes flicker {
+
+                    0%,
+                    19%,
+                    21%,
+                    23%,
+                    25%,
+                    54%,
+                    56%,
+                    100% {
+                        opacity: 1;
+                    }
+
+                    20%,
+                    24%,
+                    55% {
+                        opacity: 0.3;
+                    }
+                }
+            </style>
+
+            <script>
+                // AUTH STATE
+                let authMode = null; // 'login' or 'register'
+
+                // RESTORED Generic Click Event
+                document.getElementById('introScreen').addEventListener('click', (e) => {
+                    // Ignore if clicking buttons or modal (already handled by stopPropagation, but double check)
+                    if (e.target.closest('.auth-btn') || e.target.closest('#authModal')) return;
+
+                    // Enter as Guest
+                    enterGame(null);
+                });
+
+                function showLoginModal() {
+                    authMode = 'login';
+                    document.getElementById('authTitle').innerText = "LOGIN";
+                    document.getElementById('authTitle').style.color = "#00ff00";
+                    document.getElementById('authModal').style.display = 'flex';
+                    document.getElementById('authWarn').style.display = 'none';
+                }
+
+                function showRegisterModal() {
+                    authMode = 'register';
+                    document.getElementById('authTitle').innerText = "REGISTER";
+                    document.getElementById('authTitle').style.color = "#ff0055";
+                    document.getElementById('authModal').style.display = 'flex';
+                    document.getElementById('authWarn').style.display = 'none';
+                }
+
+                function closeAuthModal() {
+                    document.getElementById('authModal').style.display = 'none';
+                }
+
+                function handleAuthSubmit() {
+                    const login = document.getElementById('authLogin').value.trim();
+                    const pass = document.getElementById('authPass').value.trim();
+                    const warn = document.getElementById('authWarn');
+
+                    if (!login || !pass) {
+                        warn.innerText = "WPISZ LOGIN I HASLO!";
+                        warn.style.display = 'block';
+                        return;
+                    }
+
+                    // SIMULATE AUTH
+                    if (authMode === 'register') {
+                        localStorage.setItem('user_' + login, pass);
+                    } else {
+                        // Check
+                        /*
+                        const saved = localStorage.getItem('user_' + login);
+                        if (saved !== pass) {
+                            warn.innerText = "BLEDNE DANE!";
+                            warn.style.display = 'block';
+                            return;
+                        }
+                        */
+                        // Allow any login for prototyping unless strictly required
+                    }
+
+                    // SUCCESS
+                    closeAuthModal();
+                    enterGame(login);
+                }
+
+                // GLOBAL MENU HANDLER
+                window.showMainMenu = function () {
+                    console.log("SHOWING MAIN MENU (Guest Mode)");
+                    // Hide other screens
+                    document.getElementById('introScreen').style.display = 'none';
+                    document.getElementById('playerMenuScreen').style.display = 'none';
+                    document.getElementById('menuScreen').style.display = 'none'; // Character Select
+                    document.getElementById('mapSelectionScreen').style.display = 'none';
+
+                    // Show Main Menu
+                    const mm = document.getElementById('mainMenuScreen');
+                    if (mm) {
+                        mm.style.display = 'flex';
+                        mm.style.zIndex = '1000'; // High Z-Index
+
+                        // Signal Main JS
+                        if (typeof window.mainMenuActive !== 'undefined') {
+                            window.mainMenuActive = true;
+                            window.gameStarted = false;
+                            window.isRoundActive = false;
+                        }
+                    } else {
+                        console.error("Main Menu Screen not found in DOM");
+                    }
+                };
+
+                function enterGame(username) {
+                    if (username) {
+                        console.log("Logged in as:", username);
+                        window.currentUser = username;
+                        localStorage.setItem('rrb_session_user', username); // [NEW] Session Persistence
+
+                        // Initialize player data
+                        if (!window.playerData) {
+                            window.playerData = {
+                                nick: username,
+                                money: 2000,
+                                respect: 0,
+                                stamina: 100,
+                                currentCity: 'WAW' // Ensure city is set
+                            };
+                        }
+
+                        // Show Player Menu (RPG World)
+                        const intro = document.getElementById('introScreen');
+                        const menuScreen = document.getElementById('menuScreen'); // GUEST MENU
+
+                        // DISABLE CRT EFFECT
+                        document.body.classList.add('no-crt');
+
+                        intro.style.transition = 'opacity 1s';
+                        intro.style.opacity = '0';
+
+                        // Immediate hiding of conflicting menus
+                        if (menuScreen) menuScreen.style.display = 'none';
+                        const mainMenu = document.getElementById('mainMenuScreen');
+                        if (mainMenu) mainMenu.style.display = 'none';
+
+                        setTimeout(() => {
+                            intro.style.display = 'none';
+                            showPlayerMenu();
+                        }, 1000);
+                    } else {
+                        // ... Guest mode ...
+                        enterGuestMode();
+                    }
+                }
+
+                // Helper for Guest Mode (Refactored for clarity)
+                function enterGuestMode() {
+                    console.log("Entering Guest Mode");
+                    // Ensure Player Menu is hidden
+                    document.getElementById('playerMenuScreen').style.display = 'none';
+
+                    const intro = document.getElementById('introScreen');
+                    intro.style.transition = 'opacity 1s';
+                    intro.style.opacity = '0';
+
+                    setTimeout(() => {
+                        intro.style.display = 'none';
+                        window.showMainMenu(); // Now guaranteed to exist
+                    }, 1000);
+                }
+
+                function showPlayerMenu() {
+                    console.log("Showing Player Dashboard");
+                    // Hide all screens explicitly
+                    const mainMenu = document.getElementById('mainMenuScreen');
+                    const menuScreen = document.getElementById('menuScreen');
+
+                    if (mainMenu) mainMenu.style.display = 'none';
+                    if (menuScreen) menuScreen.style.display = 'none';
+                    document.getElementById('introScreen').style.display = 'none';
+
+                    // Show player menu
+                    const pm = document.getElementById('playerMenuScreen');
+                    pm.style.display = 'block';
+                    pm.style.zIndex = '200'; // Force top
+
+                    // Restore body scroll if needed (though usually hidden)
+                    document.body.style.overflow = 'hidden';
+                    document.body.classList.add('no-crt');
+
+                    // Update UI with player data
+                    if (window.playerData) {
+                        document.getElementById('playerNick').innerText = window.playerData.nick;
+                        document.getElementById('playerMoney').innerText = window.playerData.money + ' MK';
+                    }
+                }
+
+                // Player Menu Action Handlers
+                function quickFight() {
+                    console.log("Quick Fight clicked");
+                    // Route to character select -> fight
+                    if (window.showMainMenu) {
+                        document.getElementById('playerMenuScreen').style.display = 'none';
+                        window.showMainMenu();
+                    }
+                }
+
+                function openInventory() {
+                    window.location.href = 'inventory.html';
+                }
+
+                function openStats() {
+                    window.location.href = 'stats.html';
+                }
+
+                // Return to Intro (for logout)
+                function returnToMainMenu() {
+                    console.log("Returning to Intro Screen");
+
+                    // Hide all game screens
+                    document.getElementById('playerMenuScreen').style.display = 'none';
+                    document.getElementById('mainMenuScreen').style.display = 'none';
+                    document.getElementById('menuScreen').style.display = 'none';
+
+                    // Clear session
+                    localStorage.removeItem('rrb_session_user');
+                    window.currentUser = null;
+                    window.playerData = null;
+
+                    // Re-enable CRT effect
+                    document.body.classList.remove('no-crt');
+
+                    // Show intro
+                    const intro = document.getElementById('introScreen');
+                    intro.style.display = 'flex';
+                    intro.style.opacity = '1';
+                }
+
+
+
+
+                function openCity(cityCode) {
+                    window.location.href = 'map.html';
+                }
+
+                // ESC Key Navigation (for Guest mode)
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') {
+                        const mainMenu = document.getElementById('mainMenuScreen');
+                        const charSelect = document.getElementById('menuScreen');
+                        const playerMenu = document.getElementById('playerMenuScreen');
+
+                        // If in character select (guest mode), return to intro
+                        if (charSelect.style.display === 'flex') {
+                            charSelect.style.display = 'none';
+                            document.getElementById('introScreen').style.display = 'flex';
+                            document.getElementById('introScreen').style.opacity = '1';
+                        }
+                        // If in main menu (guest mode), return to intro
+                        else if (mainMenu.style.display === 'flex' || mainMenu.style.display === 'block') {
+                            mainMenu.style.display = 'none';
+                            document.getElementById('introScreen').style.display = 'flex';
+                            document.getElementById('introScreen').style.opacity = '1';
+                        }
+                        // If in player menu (logged in), return to intro and logout
+                        else if (playerMenu.style.display === 'block') {
+                            // returnToMainMenu(); // Disabled on user request
+                        }
+                    }
+                });
+
+                // ==========================================
+                // PROFILE SYSTEM UI LOGIC
+                // ==========================================
+                function updateProfileDisplay() {
+                    if (window.collectionManager) {
+                        const current = window.collectionManager.currentProfile;
+                        document.getElementById('profileDisplay').innerText = `PROFIL: ${current.toUpperCase()}`;
+
+                        // If Admin, change color logic
+                        const isAdmin = window.collectionManager.collection.isAdmin;
+                        if (isAdmin) {
+                            document.getElementById('profileDisplay').style.borderColor = '#ff0055';
+                            document.getElementById('profileDisplay').style.color = '#ff0055';
+                        } else {
+                            document.getElementById('profileDisplay').style.borderColor = '#555';
+                            document.getElementById('profileDisplay').style.color = 'white';
+                        }
+                    }
+                }
+
+                function openProfileModal() {
+                    if (!window.collectionManager) return;
+                    document.getElementById('profileModal').style.display = 'flex';
+                    renderProfileList();
+                }
+
+                function renderProfileList() {
+                    const list = document.getElementById('profileList');
+                    list.innerHTML = '';
+
+                    const profiles = window.collectionManager.getProfiles();
+                    const current = window.collectionManager.currentProfile;
+
+                    profiles.forEach(p => {
+                        const div = document.createElement('div');
+                        div.style.padding = '10px';
+                        div.style.border = '1px solid #444';
+                        div.style.cursor = 'pointer';
+                        div.style.backgroundColor = (p === current) ? '#333' : 'transparent';
+                        div.style.color = (p === current) ? '#00ff00' : '#aaa';
+                        div.innerText = p.toUpperCase();
+
+                        if (p !== current) {
+                            div.onmouseover = () => div.style.backgroundColor = '#222';
+                            div.onmouseout = () => div.style.backgroundColor = 'transparent';
+                            div.onclick = () => switchProfileUI(p);
+                        }
+
+                        list.appendChild(div);
+                    });
+                }
+
+                function switchProfileUI(name) {
+                    window.collectionManager.switchProfile(name);
+                    updateProfileDisplay();
+                    renderProfileList();
+                    // Reload Page to refresh all systems safely
+                    setTimeout(() => location.reload(), 500);
+                }
+
+                function toggleAdminPass() {
+                    const chk = document.getElementById('adminCheckbox');
+                    document.getElementById('adminPassField').style.display = chk.checked ? 'block' : 'none';
+                }
+
+                function createNewProfileUI() {
+                    const name = document.getElementById('newProfileName').value.trim();
+                    const isAdmin = document.getElementById('adminCheckbox').checked;
+                    const pass = document.getElementById('adminPassInput').value;
+
+                    if (!name) return alert("PODAJ NAZWE PROFILU!");
+                    if (isAdmin && pass !== 'admin') return alert("ZLE HASLO ADMINA!"); // Simple pass: 'admin'
+
+                    const success = window.collectionManager.createProfile(name, isAdmin);
+                    if (!success) {
+                        alert("PROFIL O TEJ NAZWIE JUZ ISTNIEJE!");
+                    } else {
+                        alert("PROFIL UTWORZONY!");
+                        switchProfileUI(name);
+                    }
+                }
+
+                // Init Display on Load
+                window.addEventListener('load', () => {
+                    setTimeout(updateProfileDisplay, 1000); // Wait for scripts
+                });
+            </script>
+
+
+            <!-- SPA VIEW LOGIC -->
+            <script>
+                // CITY DATABASE (20 CITIES)
+                const CITIES = [
+                    { id: 'WWA', name: 'Warszawa', x: 50, y: 50 },
+                    { id: 'KRK', name: 'Kraków', x: 50, y: 70 },
+                    { id: 'LDZ', name: 'Łódź', x: 48, y: 52 },
+                    { id: 'WRO', name: 'Wrocław', x: 35, y: 62 },
+                    { id: 'POZ', name: 'Poznań', x: 32, y: 45 },
+                    { id: 'GDA', name: 'Gdańsk', x: 45, y: 20 },
+                    { id: 'SZZ', name: 'Szczecin', x: 20, y: 25 },
+                    { id: 'BYD', name: 'Bydgoszcz', x: 40, y: 35 },
+                    { id: 'LUB', name: 'Lublin', x: 70, y: 55 },
+                    { id: 'BIA', name: 'Białystok', x: 75, y: 35 },
+                    { id: 'KAT', name: 'Katowice', x: 48, y: 68 },
+                    { id: 'GDY', name: 'Gdynia', x: 45, y: 18 },
+                    { id: 'CZE', name: 'Częstochowa', x: 48, y: 60 },
+                    { id: 'RAD', name: 'Radom', x: 60, y: 53 },
+                    { id: 'RZE', name: 'Rzeszów', x: 65, y: 72 },
+                    { id: 'TOR', name: 'Toruń', x: 42, y: 38 },
+                    { id: 'SOS', name: 'Sosnowiec', x: 50, y: 67 },
+                    { id: 'KIE', name: 'Kielce', x: 58, y: 60 },
+                    { id: 'GLI', name: 'Gliwice', x: 46, y: 68 },
+                    { id: 'OLS', name: 'Olsztyn', x: 60, y: 25 }
+                ];
+
+                function switchView(viewName) {
+                    document.getElementById('viewNews').style.display = 'none';
+                    document.getElementById('viewMap').style.display = 'none';
+                    document.getElementById('viewCity').style.display = 'none';
+
+                    document.getElementById('view' + viewName).style.display = 'block';
+                }
+
+                function showMap() {
+                    switchView('Map');
+                    renderMapPins();
+                    updateMapUI();
+                }
+
+                function updateMapUI() {
+                    if (window.collectionManager) {
+                        document.getElementById('mapStamina').innerText = window.collectionManager.getStamina();
+                        const cur = window.collectionManager.collection.currentCity || 'WWA';
+                        document.getElementById('mapLocation').innerText = cur;
+                        document.getElementById('mapLocation').style.color = '#00ffff';
+                    }
+                }
+
+                function renderMapPins() {
+                    const container = document.getElementById('mapContainer');
+                    container.innerHTML = ''; // Clear
+
+                    const current = window.collectionManager.collection.currentCity || 'WWA';
+
+                    CITIES.forEach(city => {
+                        const pin = document.createElement('div');
+                        pin.style.position = 'absolute';
+                        pin.style.left = city.x + '%';
+                        pin.style.top = city.y + '%';
+                        pin.style.transform = 'translate(-50%, -50%)';
+                        pin.style.cursor = 'pointer';
+                        pin.style.textAlign = 'center';
+                        pin.onclick = () => handleCityClick(city);
+
+                        const isCurrent = city.id === current;
+                        const color = isCurrent ? '#00ff00' : '#ff0055';
+                        const size = isCurrent ? '30px' : '20px';
+
+                        pin.innerHTML = `
+                    <div style="font-size: ${size}; filter: drop-shadow(0 0 5px black);">📍</div>
+                    <div style="background: rgba(0,0,0,0.7); color: ${color}; font-size: 8px; padding: 2px; border: 1px solid ${color}; margin-top: 2px;">
+                        ${city.id}
+                    </div>
+                `;
+                        container.appendChild(pin);
+                    });
+                }
+
+                function handleCityClick(city) {
+                    const current = window.collectionManager.collection.currentCity || 'WWA';
+
+                    if (city.id === current) {
+                        // Determine background based on City
+                        // For now, only Warsaw has asset, others generic or same
+                        if (city.id !== 'WWA') {
+                            // Alert prototype
+                            // But we proceed to City View anyway using generic background
+                            // Or keep Warsaw BG for all for now
+                            // alert("Wizualizacja miasta w budowie. Używam makiety WWA.");
+                        }
+                        switchView('City');
+                    } else {
+                        // Travels
+                        if (confirm(`Czy chcesz pojechać do: ${city.name}? (KOSZT: 200 MK, 20 Stamina)`)) {
+                            attemptTravel(city);
+                        }
+                    }
+                }
+
+                function attemptTravel(city) {
+                    const cm = window.collectionManager;
+                    const costMoney = 200;
+                    const costStamina = 20;
+
+                    if (cm.getMoney() < costMoney) return alert("BRAK Siana!");
+                    if (cm.getStamina() < costStamina) return alert("BRAK SIŁY!");
+
+                    cm.updateMoney(-costMoney);
+                    cm.updateStamina(-costStamina);
+                    cm.collection.currentCity = city.id;
+                    cm.saveCollection();
+
+                    alert(`Dojechałeś do: ${city.name}!`);
+                    showMap(); // Refresh pins
+                }
+
+                function restoreStamina() {
+                    if (confirm("Czy chcesz odpocząć w Hotelu? (Koszt: 100 MK, +50 Stamina)")) {
+                        const cm = window.collectionManager;
+                        if (cm.getMoney() >= 100) {
+                            cm.updateMoney(-100);
+                            cm.updateStamina(50);
+                            alert("Wypoczęty!");
+                            updateMapUI();
+                        } else {
+                            alert("Brak hajsu na hotel!");
+                        }
+                    }
+                }
+            </script>
+
+            <!-- Game Container (Scales to fit screen) -->
+            <div id="game-container"
+                style="position: relative; width: 1024px; height: 576px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+
+                <!-- CRT REMOVED -->
+
+                <!-- Character Selection Menu -->
+                <div id="menuScreen"
+                    style="position: absolute; inset: 0; background-color: #202020; display: none; flex-direction: column; align-items: center; justify-content: start; padding-top: 20px; border: 4px solid white; box-sizing: border-box; z-index: 10;">
+                    <h1
+                        style="color: white; font-family: 'Press Start 2P', cursive; margin-bottom: 20px; font-size: 24px; text-shadow: 4px 4px #ff0055;">
+                        WYBIERZ POSTAC</h1>
+
+
+
+
+
+                    <!-- 4 COLUMNS LAYOUT -->
+                    <div
+                        style="display: flex; gap: 10px; width: 100%; flex: 1; min-height: 0; margin-bottom: 10px; padding: 0 20px; box-sizing: border-box;">
+
+                        <!-- Team 2115 -->
+                        <div
+                            style="flex: 1; display: flex; flex-direction: column; align-items: center; border-right: 1px solid #333;">
+                            <h2
+                                style="color: #00ff00; font-family: 'Press Start 2P', cursive; font-size: 14px; margin-bottom: 10px;">
+                                2115</h2>
+                            <div id="team2115List" class="char-list-container">
+                                <!-- Populated by JS -->
+                            </div>
+
+                            <!-- MOVED CHARACTER PREVIEW -->
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+
+                                <!-- P2 PREVIEW (Top) -->
+                                <div id="charPreviewP2"
+                                    style="width: 150px; height: 140px; pointer-events: none; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.5); border: 2px solid #00ffff;">
+                                    <img id="charPreviewUnknownP2" src="img/logo.png"
+                                        style="width: 100%; opacity: 0.5; display: block;">
+
+                                    <!-- Dynamic Sprite P2 (Wider) -->
+                                    <div id="charPreviewSpriteP2"
+                                        style="width: 140px; height: 100px; background-repeat: no-repeat; display: none; image-rendering: pixelated;">
+                                    </div>
+                                    <h2 id="charPreviewNameP2"
+                                        style="color: #00ffff; font-family: 'Press Start 2P'; font-size: 8px; margin-top: 5px; text-shadow: 2px 2px #000; text-align: center; word-break: break-all;">
+                                        CPU
+                                    </h2>
+                                </div>
+
+                                <!-- P1 PREVIEW (Bottom) -->
+                                <div id="charPreview"
+                                    style="width: 150px; height: 140px; pointer-events: none; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.5); border: 2px solid #00ff00;">
+                                    <img id="charPreviewUnknown" src="img/logo.png"
+                                        style="width: 100%; opacity: 0.5; display: block;">
+
+                                    <!-- Dynamic Sprite P1 (Wider) -->
+                                    <div id="charPreviewSprite"
+                                        style="width: 140px; height: 100px; background-repeat: no-repeat; display: none; image-rendering: pixelated;">
+                                    </div>
+                                    <h2 id="charPreviewName"
+                                        style="color: #00ff00; font-family: 'Press Start 2P'; font-size: 8px; margin-top: 5px; text-shadow: 2px 2px #000; text-align: center; word-break: break-all;">
+                                        PLAYER 1
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team 2020 -->
+                        <div
+                            style="flex: 1; display: flex; flex-direction: column; align-items: center; border-right: 1px solid #333;">
+                            <h2
+                                style="color: #00ffff; font-family: 'Press Start 2P', cursive; font-size: 14px; margin-bottom: 10px; text-align: center;">
+                                2020 I PRZYJACIELE</h2>
+                            <div id="team2020List" class="char-list-container">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Team GOSCIE -->
+                        <div
+                            style="flex: 1; display: flex; flex-direction: column; align-items: center; border-right: 1px solid #333;">
+                            <h2
+                                style="color: #ff0055; font-family: 'Press Start 2P', cursive; font-size: 14px; margin-bottom: 10px;">
+                                GOSCIE</h2>
+                            <div id="teamGoscieList" class="char-list-container">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Team OCENIACZE -->
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                            <h2
+                                style="color: #ffff00; font-family: 'Press Start 2P', cursive; font-size: 14px; margin-bottom: 10px;">
+                                OCENIACZE</h2>
+                            <div id="teamOceniaczeList" class="char-list-container">
+                                <!-- Populated by JS -->
+                            </div>
+
+                            <!-- DIFFICULTY SELECTION (PVE ONLY) -->
+                            <div id="difficultySelect"
+                                style="display: none; flex-direction: column; align-items: center; margin-top: 10px; width: 100%;">
+                                <h2
+                                    style="color: #ffaa00; font-family: 'Press Start 2P'; font-size: 10px; margin-bottom: 5px;">
+                                    POZIOM TRUDNOSCI</h2>
+                                <div style="display: flex; gap: 5px; flex-direction: column; width: 100%;">
+                                    <button id="btnKasztan" onclick="setDifficulty('KASZTAN')"
+                                        style="background: #00ff00; border: none; font-family: 'Press Start 2P'; font-size: 8px; padding: 5px; cursor: pointer; color: black;">KASZTAN</button>
+                                    <button id="btnOgor" onclick="setDifficulty('OGOR')"
+                                        style="background: #555; border: none; font-family: 'Press Start 2P'; font-size: 8px; padding: 5px; cursor: pointer; color: #aaa;">OGOR</button>
+                                    <button id="btnChuck" onclick="setDifficulty('CHUCKNORRIS')"
+                                        style="background: #555; border: none; font-family: 'Press Start 2P'; font-size: 8px; padding: 5px; cursor: pointer; color: #aaa;">CHUCKNORRIS</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>
+                        .char-list-container {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 5px;
+                            justify-content: center;
+                            align-content: flex-start;
+                            overflow-y: auto;
+                            height: 100%;
+                            width: 100%;
+                            padding-bottom: 10px;
+                        }
+
+                        /* Hide Scrollbar */
+                        .char-list-container::-webkit-scrollbar {
+                            width: 4px;
+                        }
+
+                        .char-list-container::-webkit-scrollbar-thumb {
+                            background: #555;
+                        }
+                    </style>
+
+                    <div
+                        style="margin-top: 5px; color: yellow; font-family: 'Press Start 2P', cursive; font-size: 10px; text-align: center;">
+                        P1: WASD+SPACE/C | P2: STRZALKI+ENTER/SHIFT
+                    </div>
+                    <div id="startButton"
+                        style="position: absolute; bottom: 40px; color: #00ff00; border: 4px solid #00ff00; padding: 15px 30px; font-family: 'Press Start 2P', cursive; font-size: 20px; cursor: pointer; display: none; background-color: rgba(0,0,0,0.8); animation: blink 1s infinite;">
+                        SELECT MAP (PRESS ENTER)
+                    </div>
+                    <style>
+                        @keyframes blink {
+                            0% {
+                                opacity: 1;
+                            }
+
+                            50% {
+                                opacity: 0.5;
+                            }
+
+                            100% {
+                                opacity: 1;
+                            }
+                        }
+                    </style>
+                </div>
+
+                <!-- VS SCREEN OVERLAY -->
+                <div id="vsScreen"
+                    style="position: absolute; inset: 0; background: black; z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center;">
+
+                    <h1
+                        style="color: yellow; font-family: 'Press Start 2P'; font-size: 60px; margin: 0; text-shadow: 4px 4px red; z-index: 2;">
+                        VS</h1>
+
+                    <div style="display: flex; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+                        <!-- P1 Side -->
+                        <div
+                            style="flex: 1; background: linear-gradient(to right, #00ffff 0%, black 100%); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <div id="vsP1Image"
+                                style="width: 100%; height: 100%; background-repeat: no-repeat; background-size: contain; background-position: bottom center; filter: drop-shadow(0 0 20px #00ffff); image-rendering: pixelated;">
+                            </div>
+                        </div>
+                        <!-- P2 Side -->
+                        <div
+                            style="flex: 1; background: linear-gradient(to left, #ff0055 0%, black 100%); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <div id="vsP2Image"
+                                style="width: 100%; height: 100%; background-repeat: no-repeat; background-size: contain; background-position: bottom center; filter: drop-shadow(0 0 20px #ff0055); transform: scaleX(-1); image-rendering: pixelated;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="position: absolute; bottom: 50px; width: 100%; display: flex; justify-content: space-between; padding: 0 50px; box-sizing: border-box; z-index: 2;">
+                        <h2 id="vsP1Name" style="color: #00ffff; font-family: 'Press Start 2P'; font-size: 24px;">PLAYER
+                            1</h2>
+                        <h2 id="vsP2Name" style="color: #ff0055; font-family: 'Press Start 2P'; font-size: 24px;">PLAYER
+                            2</h2>
+                    </div>
+                </div>
+
+
+
+                <!-- MAIN MENU SCREEN -->
+                <div id="mainMenuScreen"
+                    style="position: fixed; inset: 0; background-color: #111; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100;">
+                    <h1
+                        style="color: white; font-family: 'Press Start 2P'; font-size: 40px; margin-bottom: 40px; text-shadow: 4px 4px #ff0055;">
+                        MAIN MENU</h1>
+
+                    <div id="mainMenuList"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; max-width: 950px;">
+                        <div class="menu-option" data-index="0" style="color: white;">GRACZ VS GRACZ</div>
+                        <div class="menu-option" data-index="1" style="color: #aaa;">GRACZ VS KOMPUTER</div>
+                        <div class="menu-option" data-index="2" style="color: #ffaa00;">TURNIEJ (PVE)</div>
+                        <div class="menu-option" data-index="3" style="color: white;">GRACZ VS GRACZ (ONLINE)</div>
+                        <div class="menu-option" data-index="4" style="color: #00ffff;">SZYBKI MECZ (ONLINE)</div>
+                        <div class="menu-option" data-index="5" style="color: #ffcc00;">2v2 CHAOS (ONLINE) (W TRAKCIE
+                            BUDOWY)
+                        </div>
+                        <div class="menu-option" data-index="6" style="color: #ff00ff;">4v4 TAG (ONLINE)</div>
+                        <div class="menu-option" data-index="7" style="color: #aaa;">STATYSTYKI</div>
+                        <div class="menu-option" data-index="8" style="color: #ff0055;">OPCJE</div>
+                        <div class="menu-option" data-index="9" style="color: #aaa;">PELNY EKRAN</div>
+                    </div>
+
+
+                </div>
+
+                <!-- Map Selection Screen -->
+                <div id="mapSelectionScreen"
+                    style="position: absolute; inset: 0; background-color: #202020; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+                    <h1
+                        style="color: white; font-family: 'Press Start 2P'; margin-bottom: 40px; text-shadow: 4px 4px #00ffff;">
+                        SELECT STAGE</h1>
+                    <div id="mapList"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 80%; max-width: 800px; justify-items: center;">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div
+                        style="margin-top: 40px; color: yellow; font-family: 'Press Start 2P'; font-size: 12px; text-align: center;">
+                        W/S to NAVIGATE - SPACE to SELECT<br><br>PRESS BACKSPACE TO RETURN
+                    </div>
+                </div>
+
+                <!-- TOURNAMENT SCREEN -->
+                <div id="tournamentScreen"
+                    style="position: absolute; inset: 0; background-color: #111; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+                    <h1
+                        style="color: #ffaa00; font-family: 'Press Start 2P'; margin-bottom: 20px; text-shadow: 4px 4px #500;">
+                        TURNIEJ</h1>
+
+                    <div id="tournamentInfo"
+                        style="text-align: center; color: white; font-family: 'Press Start 2P'; margin-bottom: 40px;">
+                        <h2 id="tournRoundLabel" style="color: yellow; font-size: 20px; margin-bottom: 20px;">RUNDA 1 /
+                            10</h2>
+                        <div style="font-size: 14px; color: #aaa; margin-bottom: 10px;">TWOJ PRZECIWNIK:</div>
+                        <h2 id="tournEnemyName" style="color: #ff0055; font-size: 30px; text-shadow: 2px 2px #000;">???
+                        </h2>
+                    </div>
+
+                    <div id="tournBracket"
+                        style="display: flex; flex-direction: column; gap: 5px; max-height: 200px; overflow-y: auto; width: 60%; border: 2px solid #333; padding: 10px; margin-bottom: 20px; text-align: center; font-family: 'Press Start 2P'; font-size: 10px; color: gray;">
+                        <!-- Filled by JS -->
+                    </div>
+
+                    <div onclick="startTournamentRound()" class="blink-text"
+                        style="color: #00ff00; border: 4px solid #00ff00; padding: 15px 30px; font-family: 'Press Start 2P'; cursor: pointer; text-transform: uppercase;">
+                        WALCZ! (SPACE)
+                    </div>
+                </div>
+
+                <!-- CONTROLS SCREEN OVERLAY -->
+                <div id="controlsScreen"
+                    style="position: absolute; inset: 0; background-color: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200; color: white; font-family: 'Press Start 2P';">
+                    <h2 style="color: #00ffff; margin-bottom: 30px;">STEROWANIE</h2>
+
+                    <div style="display: flex; gap: 60px; margin-bottom: 40px;">
+                        <div style="text-align: center;">
+                            <h3 style="color: #ff0055; margin-bottom: 20px;">PLAYER 1</h3>
+                            <p style="margin: 10px 0; font-size: 14px;">W - JUMP</p>
+                            <p style="margin: 10px 0; font-size: 14px;">A - LEFT</p>
+                            <p style="margin: 10px 0; font-size: 14px;">D - RIGHT</p>
+                            <p style="margin: 10px 0; font-size: 14px;">S - BLOCK</p>
+                            <p style="margin: 10px 0; font-size: 14px;">SPACE - PUNCH</p>
+                            <p style="margin: 10px 0; font-size: 14px;">C - KICK</p>
+                            <p style="margin: 10px 0; font-size: 14px; color: orange;">2x SPACE - SUPER</p>
+                        </div>
+                        <div style="width: 2px; background-color: white;"></div>
+                        <div style="text-align: center;">
+                            <h3 style="color: #ff0055; margin-bottom: 20px;">PLAYER 2</h3>
+                            <p style="margin: 10px 0; font-size: 14px;">UP - JUMP</p>
+                            <p style="margin: 10px 0; font-size: 14px;">LEFT - LEFT</p>
+                            <p style="margin: 10px 0; font-size: 14px;">RIGHT - RIGHT</p>
+                            <p style="margin: 10px 0; font-size: 14px;">DOWN - BLOCK</p>
+                            <p style="margin: 10px 0; font-size: 14px;">ENTER - PUNCH</p>
+                            <p style="margin: 10px 0; font-size: 14px;">SHIFT - KICK</p>
+                            <p style="margin: 10px 0; font-size: 14px; color: orange;">2x ENTER - SUPER</p>
+                            <p style="margin: 10px 0; font-size: 14px; color: #00ffff;">2x RIGHT/LEFT - DASH</p>
+                        </div>
+                    </div>
+
+                    <div id="controlsBackBtn"
+                        style="color: yellow; font-size: 12px; cursor: pointer; border: 2px solid yellow; padding: 10px;">
+                        PRESS ESCAPE OR BACKSPACE TO RETURN
+                    </div>
+                </div>
+
+                <!-- SIDE SELECTION SCREEN (2v2) -->
+                <div id="sideSelectionScreen"
+                    style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); flex-direction: column; align-items: center; justify-content: center; z-index: 100;">
+                    <h1 style="color: white; font-family: 'Press Start 2P'; margin-bottom: 2rem;">WYBIERZ SWOJĄ STRONĘ
+                    </h1>
+
+                    <div style="display: flex; gap: 4rem; width: 80%; justify-content: center;">
+                        <!-- TEAM 1 -->
+                        <div id="team1Container"
+                            style="border: 4px solid #00ff00; padding: 20px; width: 40%; text-align: center;">
+                            <h2 style="color: #00ff00; font-family: 'Press Start 2P';">TEAM 1</h2>
+                            <div id="slot0" class="player-slot"
+                                style="margin: 10px; padding: 10px; border: 2px dashed #555; color: #aaa; font-family: 'Press Start 2P';">
+                                P1 (HOST)</div>
+                            <div id="slot1" class="player-slot"
+                                style="margin: 10px; padding: 10px; border: 2px dashed #555; color: #aaa; font-family: 'Press Start 2P';">
+                                P2</div>
+                        </div>
+
+                        <!-- TEAM 2 -->
+                        <div id="team2Container"
+                            style="border: 4px solid #ff0055; padding: 20px; width: 40%; text-align: center;">
+                            <h2 style="color: #ff0055; font-family: 'Press Start 2P';">TEAM 2</h2>
+                            <div id="slot2" class="player-slot"
+                                style="margin: 10px; padding: 10px; border: 2px dashed #555; color: #aaa; font-family: 'Press Start 2P';">
+                                P3</div>
+                            <div id="slot3" class="player-slot"
+                                style="margin: 10px; padding: 10px; border: 2px dashed #555; color: #aaa; font-family: 'Press Start 2P';">
+                                P4</div>
+                        </div>
+                    </div>
+
+                    <div id="sideStatus"
+                        style="color: yellow; margin-top: 2rem; font-family: 'Press Start 2P'; font-size: 12px; height: 20px;">
+                    </div>
+
+                    <div id="confirmSidesBtn"
+                        style="display: none; margin-top: 2rem; padding: 15px 30px; background: #333; color: white; border: 2px solid white; font-family: 'Press Start 2P'; cursor: pointer;">
+                        ZATWIERDZ STRONY (HOST)
+                    </div>
+                </div>
+
+                <!-- ONLINE SCREEN -->
+                <!-- OPTIONS SCREEN -->
+                <div id="optionsScreen"
+                    style="position: absolute; inset: 0; background-color: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200; color: white; font-family: 'Press Start 2P';">
+                    <h2 style="color: #ff0055; margin-bottom: 20px; font-size: 24px;">OPCJE</h2>
+
+                    <div style="margin-bottom: 20px; text-align: center;">
+                        <label style="font-size: 12px; color: yellow;">GLOSNOSC GLOWNA:</label>
+                        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1"
+                            style="width: 200px; margin-left: 10px; cursor: pointer;">
+                    </div>
+
+                    <div style="display: flex; gap: 30px; margin-bottom: 20px;">
+                        <!-- P1 Keys -->
+                        <div style="text-align: center;">
+                            <h3 style="color: #00ff00; font-size: 10px; margin-bottom: 10px;">PLAYER 1</h3>
+                            <div id="p1KeysContainer"
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 8px;">
+                                <!-- Dynamic -->
+                            </div>
+                        </div>
+                        <!-- P2 Keys -->
+                        <div style="text-align: center;">
+                            <h3 style="color: #00ffff; font-size: 10px; margin-bottom: 10px;">PLAYER 2</h3>
+                            <div id="p2KeysContainer"
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 8px;">
+                                <!-- Dynamic -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="remapStatus" style="color: #00ff00; font-size: 8px; margin-bottom: 15px; height: 10px;"></p>
+
+                    <div onclick="showMainMenu()"
+                        style="color: yellow; font-size: 10px; cursor: pointer; border: 2px solid yellow; padding: 10px; text-transform: uppercase;">
+                        POWROT (ESC)
+                    </div>
+                </div>
+
+                <style>
+                    .key-bind {
+                        background: #222;
+                        padding: 4px;
+                        border: 1px solid #444;
+                        cursor: pointer;
+                        text-align: center;
+                        min-width: 50px;
+                        color: white;
+                    }
+
+                    .key-bind:hover {
+                        background: #444;
+                        border-color: #00ffff;
+                    }
+
+                    .key-bind.waiting {
+                        background: #ff0055;
+                        animation: blink 0.5s infinite;
+                        color: black;
+                    }
+                </style>
+
+                <!-- Combo Counter -->
+                <div id="comboCounter"></div>
+
+                <!-- GAME OVER MENU -->
+                <div id="gameOverMenu"
+                    style="position: absolute; inset: 0; background-color: rgba(0,0,0,0.85); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200;">
+                    <h1 id="gameOverText"
+                        style="color: white; font-family: 'Press Start 2P'; font-size: 50px; margin-bottom: 20px; text-shadow: 6px 6px #ff0055;">
+                        KONIEC GRY</h1>
+                    <div id="gameOverSubtext"
+                        style="color: yellow; font-family: 'Press Start 2P'; font-size: 30px; margin-bottom: 50px; text-shadow: 4px 4px red; text-transform: uppercase;">
+                        PLAYER 1 WINS</div>
+
+                    <div id="gameOverBtn" onclick="returnToMenu()"
+                        style="color: #00ff00; border: 4px solid #00ff00; padding: 20px; font-family: 'Press Start 2P'; cursor: pointer; animation: blink 1s infinite;">
+                        MAIN MENU (PRESS ENTER)
+                    </div>
+                </div>
+
+                <!-- ESC Key Exit Confirmation -->
+                <div id="escOverlay"
+                    style="position: absolute; inset: 0; background-color: rgba(255, 0, 0, 0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;">
+                    <h1
+                        style="color: white; font-family: 'Press Start 2P'; font-size: 30px; margin-bottom: 20px; text-align: center; line-height: 1.5;">
+                        NACISNIJ ESC<br>ZEBY WYJSC Z GRY
+                    </h1>
+                </div>
+
+                <!-- ONLINE MENU (LOBBY) -->
+                <div id="onlineScreen"
+                    style="position: absolute; inset: 0; background-color: #1a1a1a; display: none; flex-direction: column; align-items: center; z-index: 20; overflow-y: auto; padding: 40px 0;">
+                    <h1
+                        style="color: #00ffff; font-family: 'Press Start 2P'; margin-bottom: 40px; text-shadow: 0 0 10px #00ffff;">
+                        ONLINE LOBBY</h1>
+
+                    <!-- HOST / JOIN SECTION -->
+                    <div id="onlineLobbySection"
+                        style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
+                        <!-- HOST -->
+                        <div
+                            style="border: 4px solid #00ff00; padding: 30px; text-align: center; background: rgba(0,255,0,0.1);">
+                            <h2
+                                style="color: #00ff00; font-family: 'Press Start 2P'; font-size: 16px; margin-bottom: 20px;">
+                                STWORZ POKOJ</h2>
+                            <button onclick="window.networkManager.createRoom()"
+                                style="padding: 15px 30px; font-family: 'Press Start 2P'; cursor: pointer; background: #00ff00; border: none; font-weight: bold;">
+                                CREATE
+                            </button>
+                            <div id="roomCodeDisplay"
+                                style="margin-top: 20px; color: yellow; font-family: 'Press Start 2P'; font-size: 24px; min-height: 30px;">
+                            </div>
+                        </div>
+
+                        <!-- JOIN -->
+                        <div
+                            style="border: 4px solid #ff0055; padding: 30px; text-align: center; background: rgba(255,0,85,0.1);">
+                            <h2
+                                style="color: #ff0055; font-family: 'Press Start 2P'; font-size: 16px; margin-bottom: 20px;">
+                                DOLACZ</h2>
+                            <input type="text" id="roomCodeInput" placeholder="KOD POKOJU" maxlength="4"
+                                style="padding: 10px; font-family: 'Press Start 2P'; text-transform: uppercase; width: 150px; text-align: center; font-size: 16px;">
+                            <br>
+                            <button
+                                onclick="window.networkManager.joinRoom(document.getElementById('roomCodeInput').value.toUpperCase())"
+                                style="margin-top: 15px; padding: 15px 30px; font-family: 'Press Start 2P'; cursor: pointer; background: #ff0055; color: white; border: none; font-weight: bold;">
+                                JOIN
+                        </div>
+                    </div>
+
+                    <!-- MATCHMAKING SECTION -->
+                    <div id="onlineQuickMatchSection" style="margin-top: 30px; text-align: center; display: none;">
+                        <h2 id="playersOnlineCount"
+                            style="color: #ffff00; font-family: 'Press Start 2P'; font-size: 10px; margin-bottom: 20px;">
+                            GRACZY ONLINE: ...
+                        </h2>
+
+                        <div
+                            style="border: 4px solid #00ffff; padding: 20px; text-align: center; background: rgba(0,255,255,0.1); display: inline-block;">
+                            <h2
+                                style="color: #00ffff; font-family: 'Press Start 2P'; font-size: 14px; margin-bottom: 15px;">
+                                SZYBKI MECZ</h2>
+                            <!-- HIDDEN BUTTON (Auto-Triggered via JS, keeping for structure but hidden) or REMOVED? 
+                         User says "zostaw tylko pole szukania". 
+                         I will keep the status text and hide the button initially or just let JS handle it.
+                         Actually, if I hide the button, how does he cancel? 
+                         He didn't ask to hide the button, he asked to separate the views. 
+                         "szybki mecz szuka po najechaniu a nie po kliknieciu". 
+                         I will leave the button visible so he can click it if auto-start fails, OR I will just show status.
+                    -->
+                            <button id="findMatchBtn" onclick="window.networkManager.findMatch()"
+                                style="padding: 15px 30px; font-family: 'Press Start 2P'; cursor: pointer; background: #00ffff; border: none; font-weight: bold; color: black; display: none;">
+                                ZNAJDZ PRZECIWNIKA
+                            </button>
+                            <div id="matchStatus"
+                                style="margin-top: 15px; color: white; font-family: 'Press Start 2P'; font-size: 12px; display: block;">
+                                SZUKAM PRZECIWNIKA...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="onlineStatus"
+                        style="margin-top: 50px; color: gray; font-family: 'Press Start 2P'; font-size: 10px;">
+                        SERVER: DISCONNECTED
+                    </div>
+
+                    <div onclick="window.exitOnlineMenu()"
+                        style="margin-top: 40px; color: yellow; font-family: 'Press Start 2P'; font-size: 12px; cursor: pointer; border: 2px solid yellow; padding: 10px;">
+                        BACK TO MENU
+                    </div>
+                </div>
+
+
+
+                <style>
+                    .player-menu-btn {
+                        padding: 10px;
+                        font-family: 'Press Start 2P';
+                        font-size: 8px;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    }
+
+                    .player-menu-btn:hover {
+                        transform: scale(1.05);
+                        box-shadow: 0 0 15px currentColor;
+                    }
+
+                    .city-marker {
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    }
+
+                    .city-marker:hover {
+                        transform: scale(1.3);
+                    }
+
+                    .city-marker:hover .city-label {
+                        color: #ffff00;
+                        text-shadow: 0 0 10px #ffff00;
+                    }
+
+                    .city-dot {
+                        width: 12px;
+                        height: 12px;
+                        background: #00ff00;
+                        border-radius: 50%;
+                        box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+                        animation: pulse 2s infinite;
+                        margin: 0 auto 5px;
+                    }
+
+                    .city-label {
+                        color: white;
+                        font-family: 'Press Start 2P';
+                        font-size: 8px;
+                        text-align: center;
+                        text-shadow: 2px 2px #000;
+                        white-space: nowrap;
+                    }
+
+                    @keyframes pulse {
+
+                        0%,
+                        100% {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+
+                        50% {
+                            opacity: 0.7;
+                            transform: scale(1.2);
+                        }
+                    }
+                </style>
+
+                <!-- Map Selection Screen -->
+                <div id="mapSelectionScreen"
+                    style="position: absolute; inset: 0; background-color: #202020; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+                    <h1
+                        style="color: white; font-family: 'Press Start 2P'; margin-bottom: 40px; text-shadow: 4px 4px #00ffff;">
+                        SELECT STAGE</h1>
+                    <div id="mapList"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 80%; max-width: 800px; justify-items: center;">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div
+                        style="margin-top: 40px; color: yellow; font-family: 'Press Start 2P'; font-size: 12px; text-align: center;">
+                        W/S to NAVIGATE - SPACE to SELECT<br><br>PRESS BACKSPACE TO RETURN
+                    </div>
+                </div>
+
+                <!-- Statistics Screen (Iceberg) -->
+                <div id="statsScreen">
+                    <h1 class="stats-header">RETRO RAP BATTLE ICEBERG</h1>
+                    <h2 style="font-size: 10px; color: #ccc; margin-bottom: 10px;">PICK RATE & WIN RATE</h2>
+                    <div id="icebergList" class="iceberg-container">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div
+                        style="margin-top: 10px; color: yellow; font-family: 'Press Start 2P'; font-size: 10px; text-align: center;">
+                        PRESS BACKSPACE TO RETURN
+                    </div>
+                </div>
+
+                <!-- Sprite Debugger Modal -->
+                <div id="spriteDebugger"
+                    style="position: absolute; inset: 0; background-color: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: start; z-index: 1000; padding: 20px; overflow-y: auto; font-family: 'Press Start 2P'; color: white;">
+                    <h1 style="color: #00ff00; margin-bottom: 20px;">DEBUGGER POSTACI</h1>
+                    <div id="debugInfo"
+                        style="font-size: 10px; margin-bottom: 20px; color: #ff0055; text-align: center;"></div>
+
+                    <div id="debugSpriteContainer"
+                        style="position: relative; border: 2px solid white; display: inline-block;">
+                        <img id="debugSpriteImg" src="" style="display: block; image-rendering: pixelated;">
+                        <div id="debugGridOverlay" style="position: absolute; inset: 0; pointer-events: none;"></div>
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; gap: 20px;">
+                        <button onclick="document.getElementById('spriteDebugger').style.display='none'"
+                            style="padding: 10px; cursor: pointer; background: white; border: none; font-family: 'Press Start 2P'; font-size: 10px;">ZAMKNIJ
+                            (ESC)</button>
+                    </div>
+
+                    <div style="margin-top: 20px; font-size: 8px; color: gray;">
+                        KLIKNIJ KWADRAT ABY POZNAC JEGO INDEKS
+                    </div>
+                </div>
+
+                <!-- Main Game Container -->
+                <div id="gameScreen" style="position: absolute; inset: 0; display: none;">
+
+                    <!-- UI Overlay -->
+                    <div
+                        style="position: absolute; display: flex; width: 100%; align-items: flex-start; padding: 20px; box-sizing: border-box; z-index: 5;">
+
+                        <!-- Player 1 Health & Energy -->
+                        <div
+                            style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: flex-end;">
+
+                            <!-- Health -->
+                            <div style="position: relative; width: 100%; height: 30px; border: 4px solid white;">
+                                <div style="background-color: red; height: 100%; width: 100%;"></div>
+                                <div id="playerHealth"
+                                    style="position: absolute; background-color: #818cf8; top: 0; right: 0; bottom: 0; width: 100%;">
+                                </div>
+                            </div>
+
+                            <!-- Energy -->
+                            <div
+                                style="position: relative; width: 100%; height: 10px; margin-top: 5px; border: 2px solid white; background-color: #222; overflow: hidden;">
+                                <div id="playerEnergy"
+                                    style="position: absolute; top: 0; left: 0; bottom: 0; width: 20%; background-color: orange; transition: width 0.1s, background-color 0.2s;">
+                                </div>
+                                <!-- Super Markers -->
+                                <div
+                                    style="position: absolute; left: 80%; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.5); z-index: 5;">
+                                </div>
+                                <div
+                                    style="position: absolute; left: 99%; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.7); z-index: 5;">
+                                </div>
+                            </div>
+
+                            <div id="playerName"
+                                style="position: absolute; top: 55px; left: 0; color: white; font-family: 'Press Start 2P'; font-size: 16px;">
+                                Player 1
+                            </div>
+                            <!-- Pips moved out to avoid innerText overwrite -->
+                            <div id="p1Pips" style="position: absolute; top: 80px; left: 0; display: flex; gap: 5px;">
+                                <div class="round-pip"></div>
+                                <div class="round-pip"></div>
+                            </div>
+                        </div>
+
+                        <!-- Center: Logo & Timer -->
+                        <div
+                            style="display: flex; flex-direction: column; align-items: center; margin: 0 15px; flex-shrink: 0;">
+                            <!-- Logo (Scaled) -->
+                            <img src="img/logo2.png" alt="Logo"
+                                style="width: 80px; height: auto; margin-bottom: 5px; image-rendering: pixelated; filter: drop-shadow(2px 2px 0 #000);">
+
+                            <!-- Timer -->
+                            <div id="timer"
+                                style="background-color: black; width: 60px; height: 40px; display: flex; align-items: center; justify-content: center; color: white; border: 4px solid white; font-family: 'Press Start 2P', cursive; font-size: 16px;">
+                                60
+                            </div>
+                        </div>
+
+                        <!-- Player 2 Health & Energy -->
+                        <div
+                            style="position: relative; width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
+
+                            <!-- Health -->
+                            <div style="position: relative; width: 100%; height: 30px; border: 4px solid white;">
+                                <div style="background-color: red; height: 100%; width: 100%;"></div>
+                                <div id="enemyHealth"
+                                    style="position: absolute; background-color: #818cf8; top: 0; left: 0; bottom: 0; width: 100%;">
+                                </div>
+                            </div>
+
+                            <!-- Energy -->
+                            <div
+                                style="position: relative; width: 100%; height: 10px; margin-top: 5px; border: 2px solid white; background-color: #222; overflow: hidden;">
+                                <div id="enemyEnergy"
+                                    style="position: absolute; top: 0; left: 0; bottom: 0; width: 20%; background-color: orange; transition: width 0.1s, background-color 0.2s;">
+                                </div>
+                                <!-- Super Markers -->
+                                <div
+                                    style="position: absolute; left: 80%; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.5); z-index: 5;">
+                                </div>
+                                <div
+                                    style="position: absolute; left: 99%; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.7); z-index: 5;">
+                                </div>
+                            </div>
+
+                            <div id="enemyName"
+                                style="position: absolute; top: 55px; right: 0; color: white; font-family: 'Press Start 2P'; font-size: 16px;">
+                                Player 2
+                            </div>
+                            <!-- Pips moved out -->
+                            <div id="p2Pips"
+                                style="position: absolute; top: 80px; right: 0; display: flex; gap: 5px; justify-content: flex-end;">
+                                <div class="round-pip"></div>
+                                <div class="round-pip"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Game Over / Message Display -->
+                    <div id="displayText"
+                        style="position: absolute; color: white; align-items: center; justify-content: center; top: 0; right: 0; bottom: 0; left: 0; display: none; font-family: 'Press Start 2P', cursive; font-size: 40px; text-shadow: 2px 2px black; z-index: 10;">
+                        Tie
+                    </div>
+
+                    <!-- Round Message Overlay -->
+                    <div id="roundOverlay"
+                        style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20; pointer-events: none;">
+                        <div id="roundMessage" class="retro-fire-text" style="font-size: 80px; text-align: center;">
+                            ROUND 1
+                        </div>
+                        <div id="fightMessage" class="retro-fire-text" style="font-size: 100px; display: none;">FIGHT!
+                        </div>
+                    </div>
+
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <!-- Mobile Controls (Visible on touch devices or small screens) -->
+            <div id="mobile-controls" style="display: none;">
+                <div id="dpad">
+                    <div class="dpad-btn" id="btn-up" data-key="w">▲</div>
+                    <div class="dpad-row">
+                        <div class="dpad-btn" id="btn-left" data-key="a">◀</div>
+                        <div class="dpad-btn" id="btn-down" data-key="s">▼</div>
+                        <div class="dpad-btn" id="btn-right" data-key="d">▶</div>
+                    </div>
+                </div>
+                <div id="action-buttons">
+                    <div class="action-btn" id="btn-kick" data-key="c">KICK (C)</div>
+                    <div class="action-btn" id="btn-punch" data-key=" ">PUNCH (SPC)</div>
+                </div>
+            </div>
+
+            <!-- Mobile Toggle Button (Visible always on small screens to re-enable controls if hidden) -->
+            <div id="mobile-toggle"
+                style="position: fixed; top: 10px; right: 10px; z-index: 10001; color: white; border: 2px solid white; padding: 5px; font-family: 'Press Start 2P'; font-size: 10px; background: rgba(0,0,0,0.5); cursor: pointer; display: none;">
+                PAD
+            </div>
+
+            <!-- Scaling Script -->
+            <script>
+                function resizeGame() {
+                    const container = document.getElementById('game-container');
+                    const windowWidth = window.innerWidth;
+                    const windowHeight = window.innerHeight;
+                    const targetAspect = 1024 / 576;
+                    const windowAspect = windowWidth / windowHeight;
+
+                    let scale;
+                    if (windowAspect > targetAspect) {
+                        // Window is wider than game -> limit by height
+                        scale = windowHeight / 576;
+                    } else {
+                        // Window is narrower -> limit by width
+                        scale = windowWidth / 1024;
+                    }
+
+                    container.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    container.style.left = '50%';
+                    container.style.top = '50%';
+                    container.style.position = 'absolute';
+                }
+
+                window.addEventListener('resize', resizeGame);
+                window.addEventListener('load', resizeGame);
+                // Initial call
+                resizeGame();
+            </script>
+
+            <!-- ONLINE -->
+            <!-- INFO POPUP -->
+            <div id="infoPopup"
+                style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        background-color: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; text-align: center; color: white;">
+                <div
+                    style="position: relative; background: #222; border: 4px solid white; padding: 20px; max-width: 90%; width: 600px; font-family: 'Press Start 2P', cursive; line-height: 1.5; font-size: 10px;">
+                    <div onclick="document.getElementById('infoPopup').style.display='none'"
+                        style="position: absolute; top: 10px; right: 15px; cursor: pointer; color: #ff0055; font-size: 20px; font-family: arial; font-weight: bold;">
+                        X
+                    </div>
+                    <h2 style="color: red; margin-bottom: 20px; font-size: 20px; text-shadow: 2px 2px #500;">INFORMACJA
+                        UPDATE!
+                    </h2>
+                    <div
+                        style="margin-bottom: 20px; text-transform: uppercase; text-align: justify; font-size: 9px; line-height: 1.8;">
+                        <span style="color: red; text-shadow: 1px 1px 0 #fff;">UWAGA!!</span> NOWY SILNIK
+                        .<br><br>
+
+                        <span style="color: #00ffff;">AKTUALIZACJA V 1.2 (03.02.2026)</span><br>
+                        - DODANO KILKA NOWYCH POSTACI<br>
+                        - W MENU OPCJI MOZNA ZMIENIC KLAWISZE DO GRY
+                        - NOWE TRYBY W TRAKCIE OGARNIANIA
+                        - 4.02.2026.<br><br>
+
+                        GRA STWORZONA W CELACH HUMORYSTYCZNYCH.
+                    </div>
+                    <button id="closeInfoBtn"
+                        style="font-family: 'Press Start 2P'; padding: 15px 20px; background: white; border: none; cursor: pointer; color: black; font-size: 12px;">
+                        ZAMKNIJ
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCRIPTS -->
+            <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+            <script src="js/managers/NetworkManager.js?v=65"></script>
+
+            <script src="js/utils.js?v=70"></script>
+            <script src="js/classes/Sprite.js?v=70"></script>
+            <script src="js/classes/particle.js?v=70"></script>
+            <script src="js/classes/floatingtext.js?v=70"></script>
+            <script src="js/classes/Fighter.js?v=70"></script>
+            <script src="js/classes/AudioManager.js?v=70"></script>
+            <script src="js/data/roster.js?v=70"></script>
+            <script src="js/data/rap_quotes.js?v=70"></script>
+            <script src="js/managers/StatsManager.js?v=70"></script>
+            <script src="js/effects.js?v=70"></script>
+            <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+
+            <!-- GAME SYSTEMS -->
+            <script src="js/data/cards.js?v=71"></script>
+            <script src="js/data/achievements.js?v=71"></script>
+            <script src="js/CollectionManager.js?v=71"></script>
+            <script src="js/PackManager.js?v=71"></script>
+            <script src="js/AchievementManager.js?v=71"></script>
+            <script>
+                // Init Managers
+                try {
+                    window.collectionManager = new CollectionManager();
+                    window.packManager = new PackManager();
+                    window.achievementManager = new AchievementManager();
+                    console.log("Systems Initialized: Collection, Pack, Achievements");
+                } catch (e) {
+                    console.error("Failed to init managers:", e);
+                }
+            </script>
+            <script src="js/PhaserCombat.js?v=70"></script>
+            <script src="js/main.js?v=70"></script>
+</body>
+
+</html>

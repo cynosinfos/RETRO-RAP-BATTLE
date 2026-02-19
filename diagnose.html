@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>RRB Diagnostics</title>
+    <style>
+        body {
+            background: #111;
+            color: #0f0;
+            font-family: monospace;
+            padding: 20px;
+        }
+
+        .log {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #333;
+            padding: 5px;
+        }
+
+        .error {
+            color: #f00;
+        }
+
+        .success {
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        .warn {
+            color: #fa0;
+        }
+
+        button {
+            padding: 10px;
+            background: #333;
+            color: white;
+            border: 1px solid #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🕵️ RRB DIAGNOSTICS TOOL</h1>
+    <p>This tool checks connection to the server and database.</p>
+    <button onclick="runDiagnostics()">▶ RUN DIAGNOSTICS</button>
+    <button onclick="copyLogs()">📋 COPY LOGS</button>
+    <div id="output"
+        style="margin-top: 20px; border: 1px solid #555; padding: 10px; height: 500px; overflow-y: scroll; background: #000;">
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/AuthManager.js?v=999"></script>
+    <script src="js/data/cards.js?v=999"></script>
+    <!-- MOCK dependencies if needed -->
+    <script>
+        window.achievementManager = {
+            getExportData: () => ({}),
+            importData: () => { },
+            trackEvent: () => { }
+        };
+    </script>
+    <script src="js/CollectionManager.js?v=999"></script>
+
+    <script>
+        const logs = [];
+        function log(msg, type = 'info') {
+            const el = document.getElementById('output');
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            el.appendChild(div);
+            logs.push(`[${type.toUpperCase()}] ${msg}`);
+            el.scrollTop = el.scrollHeight;
+        }
+
+        async function runDiagnostics() {
+            document.getElementById('output').innerHTML = '';
+            logs.length = 0;
+            log("Starting Diagnostics...", 'warn');
+
+            // 1. Check Auth
+            if (!window.authManager) {
+                log("CRITICAL: AuthManager not loaded!", 'error');
+                return;
+            }
+            log(`AuthManager Loaded. API Base: ${window.authManager.apiBase}`);
+
+            const token = localStorage.getItem('jwt_token');
+            log(`JWT Token present: ${token ? 'YES' : 'NO'}`, token ? 'success' : 'error');
+
+            if (!token) {
+                log("PLEASE LOGIN FIRST IN THE GAME!", 'error');
+                return;
+            }
+
+            // 2. Check User Info
+            const userInfo = localStorage.getItem('user_info');
+            log(`User Info present: ${userInfo ? 'YES' : 'NO'}`, userInfo ? 'success' : 'warn');
+            if (userInfo) log(`User: ${userInfo}`);
+
+            // 3. Test API Connectivity
+            log("Testing API Connectivity...");
+            try {
+                // Try health check first if exists, or just profile
+                // We'll try profile GET directly
+                const res = await fetch(`${window.authManager.apiBase}/profile`, {
+                    headers: window.authManager.getAuthHeaders()
+                });
+
+                log(`GET /profile Status: ${res.status}`);
+
+                if (res.status === 401 || res.status === 403) {
+                    log("Auth Failed! Token might be expired.", 'error');
+                    return;
+                }
+
+                if (res.ok) {
+                    const data = await res.json();
+                    log("Profile Data Failed to Load?", 'info');
+                    log(`Raw Data: ${JSON.stringify(data)}`);
+
+                    if (data.collection && Array.isArray(data.collection.cards)) {
+                        log(`Server has ${data.collection.cards.length} cards.`, 'success');
+                    } else {
+                        log("Collection format weird or empty.", 'warn');
+                    }
+                } else {
+                    const txt = await res.text();
+                    log(`API Error Body: ${txt}`, 'error');
+                }
+
+            } catch (e) {
+                log(`Network Error: ${e.message}`, 'error');
+                return;
+            }
+
+            // 4. Test Save
+            log("Testing SAVE functionality...");
+            const cm = new CollectionManager();
+            // Wait for internal load
+            await new Promise(r => setTimeout(r, 1000));
+
+            log("Attempting to add Test Card 'test_card_diag'...");
+
+            // Mock card database find if needed for saveCollection
+            // We assume CARDS_DATABASE is loaded.
+            if (typeof CARDS_DATABASE === 'undefined') {
+                log("CARDS_DATABASE not loaded!", 'error');
+                window.CARDS_DATABASE = [{ id: 'test_card_diag', tier: 'UNDERGROUND' }];
+            } else {
+                // Push a fake card to DB if not exists
+                if (!CARDS_DATABASE.find(c => c.id === 'test_card_diag')) {
+                    CARDS_DATABASE.push({ id: 'test_card_diag', tier: 'UNDERGROUND', name: 'TEST CARD', type: 'RAPER' });
+                }
+            }
+
+            cm.addCard('test_card_diag', 1);
+
+            // Wait for save (addCard triggers save async)
+            log("Waiting for save to complete...");
+            await new Promise(r => setTimeout(r, 2000));
+
+            // 5. Verify Load
+            log("Verifying persistence by reloading from API...");
+            try {
+                const res2 = await fetch(`${window.authManager.apiBase}/profile`, {
+                    headers: window.authManager.getAuthHeaders()
+                });
+                const data2 = await res2.json();
+
+                const found = data2.collection.cards.find(c => c.id === 'test_card_diag');
+                if (found) {
+                    log(`SUCCESS! Found test card with count: ${found.count}`, 'success');
+                } else {
+                    log("FAILURE! Test card NOT found in server response.", 'error');
+                    log(`Server Cards: ${JSON.stringify(data2.collection.cards)}`);
+                }
+
+            } catch (e) {
+                log(`Verification Error: ${e.message}`, 'error');
+            }
+
+            log("DIAGNOSTICS COMPLETE", 'warn');
+        }
+
+        function copyLogs() {
+            navigator.clipboard.writeText(logs.join('\n'));
+            alert("Logi skopiowane do schowka!");
+        }
+    </script>
+</body>
+
+</html>

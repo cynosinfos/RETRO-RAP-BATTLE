@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Kolekcji</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .menu {
+            text-align: center;
+        }
+
+        h1 {
+            color: #00ffff;
+            font-size: 32px;
+            margin-bottom: 60px;
+            text-shadow: 0 0 30px #00ffff;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff0099 0%, #ff00ff 100%);
+            border: none;
+            color: white;
+            font-family: 'Press Start 2P';
+            font-size: 16px;
+            padding: 20px 40px;
+            cursor: pointer;
+            margin: 15px;
+            transition: all 0.3s;
+            display: block;
+            width: 400px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.8);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu">
+        <h1>🎴 KARTY</h1>
+
+        <button class="btn" onclick="openCollection()">
+            📦 KOLEKCJA
+        </button>
+
+        <button class="btn" onclick="openPackOpening()">
+            🎁 OTWÓRZ PACZKI
+        </button>
+
+        <button class="btn secondary" onclick="window.location.href='index.html?view=playerMenu'">
+            ← POWRÓT
+        </button>
+    </div>
+
+    <script src="js/CollectionManager.js?v=75"></script>
+    <script>
+        // Give starter pack on first visit
+        // Give starter pack on first visit
+        const collectionManager = new CollectionManager();
+
+        // CHECK URL PROFILE
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlProfile = urlParams.get('profile');
+        if (urlProfile && urlProfile !== 'null') {
+            if (collectionManager.currentProfile !== urlProfile) {
+                collectionManager.switchProfile(urlProfile);
+                console.log("Switched to URL profile:", urlProfile);
+            }
+        }
+
+        if (!localStorage.getItem('rrb_starter_pack_claimed')) {
+            // Add 10 random cards as starter
+            const starterCards = [
+                'quebonafide', 'taco', 'bedoes', 'young_leosia', 'paluch',
+                'ostr', 'szpaku', 'mata', 'bonus_rpk', 'bialas'
+            ];
+
+            starterCards.forEach(id => {
+                collectionManager.addCard(id);
+            });
+
+            // Add some money
+            collectionManager.updateMoney(5000);
+
+            localStorage.setItem('rrb_starter_pack_claimed', 'true');
+
+            alert('🎁 STARTER PACK RECEIVED!\n\n10 kart + 5000 MK');
+        }
+
+        function openPackOpening() {
+            const profile = collectionManager.currentProfile || localStorage.getItem('rrb_current_profile') || 'default';
+            window.location.href = `pack_opening.html?profile=${profile}`;
+        }
+
+        function openCollection() {
+            const profile = collectionManager.currentProfile || localStorage.getItem('rrb_current_profile') || 'default';
+            window.location.href = `collection.html?profile=${profile}`;
+        }
+    </script>
+</body>
+
+</html>

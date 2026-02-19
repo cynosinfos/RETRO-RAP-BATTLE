@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Sprite Debugger</title>
+    <style>
+        body {
+            background: #222;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .controls {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #444;
+            border-radius: 8px;
+        }
+
+        canvas {
+            border: 2px solid red;
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="controls">
+        <label>Row: <input type="number" id="rowInput" value="0" min="0" max="7"></label>
+        <label>Cols: <input type="number" id="colInput" value="8" min="1"></label>
+        <label>Scale: <input type="number" id="scaleInput" value="2.5" step="0.1"></label>
+        <button onclick="updateSettings()">Update</button>
+        <button onclick="toggleGrid()">Toggle Grid</button>
+    </div>
+    <canvas id="debugCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('debugCanvas');
+        const c = canvas.getContext('2d');
+        canvas.width = 1024;
+        canvas.height = 576;
+
+        let showGrid = true;
+
+        class Sprite {
+            constructor({ position, imageSrc, scale = 1, framesMax = 1, rows = 1, framesRow = 0 }) {
+                this.position = position;
+                this.image = new Image();
+                this.image.src = imageSrc;
+                this.scale = scale;
+                this.framesMax = framesMax;
+                this.rows = rows;
+                this.framesRow = framesRow;
+                this.framesCurrent = 0;
+                this.framesElapsed = 0;
+                this.framesHold = 10;
+                this.loaded = false;
+
+                this.image.onload = () => {
+                    this.loaded = true;
+                    console.log("Image Loaded:", this.image.width, "x", this.image.height);
+                };
+            }
+
+            draw() {
+                if (!this.loaded) return;
+
+                const frameWidth = this.image.width / this.framesMax;
+                const frameHeight = this.image.height / this.rows;
+
+                // Draw whole sheet ghost (optional)
+                // c.globalAlpha = 0.1;
+                // c.drawImage(this.image, 0, 0);
+                // c.globalAlpha = 1.0;
+
+                const dstX = this.position.x;
+                const dstY = this.position.y;
+                const dstW = frameWidth * this.scale;
+                const dstH = frameHeight * this.scale;
+
+                c.drawImage(
+                    this.image,
+                    this.framesCurrent * frameWidth,
+                    this.framesRow * frameHeight,
+                    frameWidth,
+                    frameHeight,
+                    dstX,
+                    dstY,
+                    dstW,
+                    dstH
+                );
+
+                if (showGrid) {
+                    c.strokeStyle = 'cyan';
+                    c.lineWidth = 1;
+                    c.strokeRect(dstX, dstY, dstW, dstH);
+
+                    // Crosshair
+                    c.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+                    c.beginPath();
+                    c.moveTo(dstX + dstW / 2, dstY);
+                    c.lineTo(dstX + dstW / 2, dstY + dstH);
+                    c.moveTo(dstX, dstY + dstH / 2);
+                    c.lineTo(dstX + dstW, dstY + dstH / 2);
+                    c.stroke();
+                }
+            }
+
+            update() {
+                this.draw();
+                this.framesElapsed++;
+                if (this.framesElapsed % this.framesHold === 0) {
+                    if (this.framesCurrent < this.framesMax - 1) {
+                        this.framesCurrent++;
+                    } else {
+                        this.framesCurrent = 0;
+                    }
+                }
+            }
+        }
+
+        let bedoes = new Sprite({
+            position: { x: 400, y: 200 },
+            imageSrc: './img/bedoes_2115_8x8.png',
+            scale: 2.5,
+            framesMax: 8,
+            rows: 8,
+            framesRow: 0
+        });
+
+        function updateSettings() {
+            const row = parseInt(document.getElementById('rowInput').value);
+            const cols = parseInt(document.getElementById('colInput').value);
+            cone = parseFloat(document.getElementById('scaleInput').value);
+
+            bedoes.framesRow = row;
+            bedoes.framesMax = cols;
+            bedoes.scale = scale;
+            bedoes.framesCurrent = 0;
+        }
+
+        function toggleGrid() {
+            showGrid = !showGrid;
+        }
+
+        function animate() {
+            window.requestAnimationFrame(animate);
+            c.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw Center Line
+            c.strokeStyle = '#555';
+            c.beginPath();
+            c.moveTo(canvas.width / 2, 0);
+            c.lineTo(canvas.width / 2, canvas.height);
+            c.stroke();
+
+            bedoes.update();
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

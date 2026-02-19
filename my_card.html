@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moja Postać - RRB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #ff0055;
+            color: white;
+            text-decoration: none;
+            padding: 15px 25px;
+            font-size: 10px;
+            border: 2px solid white;
+            box-shadow: 0 0 10px #ff0055;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            background: #ff0000;
+        }
+
+        h1 {
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .card-display {
+            transform: scale(1.05);
+            margin-bottom: 40px;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.5));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: scale(1.05) translateY(0);
+            }
+
+            50% {
+                transform: scale(1.05) translateY(-10px);
+            }
+        }
+
+        .change-btn {
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            border: none;
+            color: black;
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            padding: 15px 40px;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00ff00;
+            transition: all 0.3s;
+            text-decoration: none;
+            margin-top: 100px;
+            display: inline-block;
+        }
+
+        .change-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px #00ff00;
+        }
+
+        .no-card-msg {
+            color: #555;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html?view=playerMenu" class="back-btn"
+        onclick="event.preventDefault(); window.location.href='index.html?view=playerMenu';">
+        🛑 WRÓĆ DO MENU
+    </a>
+
+    <h1>TWOJA POSTAĆ</h1>
+
+    <div id="cardContainer" class="card-display">
+        <!-- JS Injected -->
+    </div>
+
+    <div id="noCard" style="display: none; text-align: center;">
+        <div class="no-card-msg">NIE WYBRANO POSTACI DO WALKI!</div>
+    </div>
+
+    <a href="#" id="changeBtn" class="change-btn">ZMIEN POSTAC</a>
+
+    <script src="js/AuthManager.js"></script>
+    <script src="js/data/cards.js"></script>
+    <script src="js/data/custom_labels.js"></script>
+    <script src="js/CardGenerator.js"></script>
+    <script src="js/data/tracks.js?v=75"></script>
+    <script src="js/classes/AudioManager.js?v=75"></script>
+    <script src="js/ui/RadioBar.js?v=75"></script>
+    <script src="js/CollectionManager.js"></script>
+    <script>
+        window.authManager = new AuthManager();
+        const collectionManager = new CollectionManager();
+        const cardGenerator = new CardGenerator();
+
+        async function init() {
+            // Check URL profile sync
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlProfile = urlParams.get('profile');
+            if (urlProfile && urlProfile !== 'null') {
+                if (collectionManager.currentProfile !== urlProfile) {
+                    collectionManager.switchProfile(urlProfile);
+                }
+            }
+
+            const card = collectionManager.getSelectedCard();
+
+            if (card) {
+                const cardEl = await cardGenerator.generateCardElement(card);
+                document.getElementById('cardContainer').appendChild(cardEl);
+            } else {
+                document.getElementById('noCard').style.display = 'block';
+                document.getElementById('cardContainer').style.display = 'none';
+            }
+
+            // Setup change button click handler
+            document.getElementById('changeBtn').addEventListener('click', function (e) {
+                e.preventDefault();
+                const p = collectionManager.currentProfile || localStorage.getItem('rrb_current_profile') || 'default';
+                window.location.href = 'collection.html?profile=' + p;
+            });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

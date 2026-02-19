@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAP ROOM - RRB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* BACK BUTTON */
+        .back-btn {
+            position: fixed;
+            top: 100px;
+            /* Lowered to avoid radio bar */
+            left: 20px;
+            z-index: 3000;
+            background: #ff0055;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            font-size: 10px;
+            border: 2px solid white;
+            box-shadow: 0 0 15px #ff0055;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            background: #ff0000;
+        }
+
+        /* INVENTORY TOGGLE BUTTON */
+        .inv-toggle-btn {
+            position: fixed;
+            top: 150px;
+            /* Lowered 50px more as requested */
+            right: 20px;
+            z-index: 3000;
+            background: #00ffff;
+            color: black;
+            padding: 12px 20px;
+            font-size: 10px;
+            border: 2px solid white;
+            box-shadow: 0 0 15px #00ffff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .inv-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px #00ffff;
+        }
+
+        /* MAIN ROOM CONTAINER */
+        .rap-room-container {
+            width: 100vw;
+            height: 100vh;
+            background: url('img/rap_room_bg.png') no-repeat center center / cover;
+            background-color: #1a1a1a;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.5s ease-in-out;
+        }
+
+        .room-header {
+            position: absolute;
+            top: 160px;
+            /* Lowered */
+            width: 100%;
+            text-align: center;
+            color: #00ffff;
+            text-shadow: 3px 3px 0 #000, 0 0 20px #00ffff;
+            font-size: 28px;
+            pointer-events: none;
+            letter-spacing: 4px;
+        }
+
+        /* SLOTS GRID */
+        .shelves-grid {
+            width: 80%;
+            max-width: 1000px;
+            height: 50%;
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .item-slot {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .item-slot:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #00ffff;
+        }
+
+        .item-slot.occupied {
+            border-style: solid;
+            border-color: #ff0055;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .item-slot.selected-slot {
+            border-color: #00ff00;
+            box-shadow: 0 0 20px #00ff00;
+        }
+
+        .item-icon {
+            font-size: 50px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+
+        /* INVENTORY OVERLAY */
+        .inventory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 4000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .overlay-title {
+            font-size: 20px;
+            color: #ff0055;
+            margin-top: 60px;
+            /* Lowered */
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #ff0055;
+            text-align: center;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            max-width: 900px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .inv-item {
+            background: #111;
+            border: 2px solid #333;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .inv-item:hover {
+            border-color: #00ffff;
+            transform: translateY(-5px);
+        }
+
+        .inv-item.selected {
+            border-color: #00ff00;
+            background: #002200;
+        }
+
+        .inv-item-icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .inv-item-name {
+            font-size: 8px;
+            color: #aaa;
+        }
+
+        .close-overlay {
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: #555;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+        }
+
+        .close-overlay:hover {
+            background: #777;
+        }
+
+        /* INFO PANEL */
+        .info-panel {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ffff;
+            padding: 20px;
+            display: none;
+            z-index: 2000;
+            text-align: center;
+        }
+
+        .info-title {
+            color: #00ffff;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .info-desc {
+            color: #ccc;
+            font-size: 9px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .info-stats {
+            color: #00ff00;
+            font-size: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: 2px solid white;
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .btn-place {
+            background: #00ffff;
+            color: #000;
+        }
+
+        .btn-remove {
+            background: #ff0055;
+            color: #fff;
+        }
+
+        /* SCROLLBAR */
+        .inventory-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .inventory-grid::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        .inventory-grid::-webkit-scrollbar-thumb {
+            background: #00ffff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="#" class="back-btn" onclick="goBack(event)">🛑 WRÓĆ</a>
+    <button class="inv-toggle-btn" onclick="toggleInventory()">📦 TWOJA SZAFKA</button>
+
+    <div class="rap-room-container" id="roomBg">
+        <div class="room-header">MÓJ POKÓJ</div>
+
+        <div class="shelves-grid" id="roomGrid">
+            <!-- Slots -->
+        </div>
+
+        <div class="info-panel" id="infoPanel">
+            <div class="info-title" id="itemName">NAZWA</div>
+            <div class="info-desc" id="itemDesc">Opis...</div>
+            <div class="info-stats" id="itemStats">Bonusy...</div>
+            <div class="btn-group">
+                <button id="placeBtn" class="action-btn btn-place">USTAW TUTAJ</button>
+                <button id="useBtn" class="action-btn"
+                    style="background:#00ff00; color:black; display:none">UŻYJ</button>
+                <button id="removeBtn" class="action-btn btn-remove" style="display:none">USUŃ</button>
+                <button onclick="hideInfo()" class="action-btn"
+                    style="background:#333; color:white; margin-left:10px;">ZAMKNIJ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INVENTORY OVERLAY -->
+    <div class="inventory-overlay" id="inventoryOverlay">
+        <div class="overlay-title">WYBIERZ PRZEDMIOT DO POSTAWIENIA</div>
+        <div class="inventory-grid" id="inventoryGrid">
+            <!-- Items -->
+        </div>
+        <button class="close-overlay" onclick="toggleInventory()">WRÓĆ DO POKOJU</button>
+    </div>
+
+    <script src="js/managers/StatsManager.js"></script>
+    <script src="js/InventoryManager.js"></script>
+    <script>
+        const im = new InventoryManager();
+        const sm = window.statsManager || new StatsManager();
+        let selectedItem = null;
+        let selectedSlot = null;
+
+        function goBack(e) {
+            if (e) e.preventDefault();
+            if (window.parent && window.parent.closeSubpage) {
+                window.parent.closeSubpage();
+            } else {
+                window.location.href = 'index.html?view=playerMenu';
+            }
+        }
+
+        // Handle ESC Key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('inventoryOverlay').style.display === 'flex') {
+                    toggleInventory();
+                } else if (document.getElementById('infoPanel').style.display === 'block') {
+                    hideInfo();
+                } else {
+                    goBack();
+                }
+            }
+        });
+
+        function init() {
+            im.refreshProfile();
+            sm.refreshProfile();
+            updateBackground();
+            renderRoom();
+            renderInventory();
+        }
+
+        function updateBackground() {
+            const bg = document.getElementById('roomBg');
+            const props = sm.stats.rpg.properties || [];
+
+            // Priority list for backgrounds
+            if (props.includes('prop_villa')) bg.style.backgroundImage = "url('img/room_villa.png')";
+            else if (props.includes('prop_apt')) bg.style.backgroundImage = "url('img/room_apt.png')";
+            else if (props.includes('prop_house')) bg.style.backgroundImage = "url('img/room_house.png')";
+            else if (props.includes('prop_flat')) bg.style.backgroundImage = "url('img/room_flat.png')";
+            else if (props.includes('prop_camper')) bg.style.backgroundImage = "url('img/room_camper.png')";
+            else if (props.includes('prop_tent')) bg.style.backgroundImage = "url('img/room_tent.png')";
+            else bg.style.backgroundImage = "url('img/rap_room_bg.png')";
+        }
+
+        function toggleInventory() {
+            const overlay = document.getElementById('inventoryOverlay');
+            const isVisible = overlay.style.display === 'flex';
+            overlay.style.display = isVisible ? 'none' : 'flex';
+            if (!isVisible) renderInventory();
+        }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventoryGrid');
+            grid.innerHTML = '';
+            const items = im.getItems();
+
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `inv-item ${selectedItem && selectedItem.uniqueId === (item.id + '_' + index) ? 'selected' : ''}`;
+                div.innerHTML = `
+                    <div class="inv-item-icon">${item.icon}</div>
+                    <div class="inv-item-name">${item.name}</div>
+                `;
+                div.onclick = () => {
+                    selectedItem = { ...item, uniqueId: (item.id + '_' + index) };
+                    toggleInventory();
+                    showInfo(item, false);
+                };
+                grid.appendChild(div);
+            });
+        }
+
+        function renderRoom() {
+            const grid = document.getElementById('roomGrid');
+            grid.innerHTML = '';
+            const placed = im.inventory.placedItems || {};
+
+            for (let i = 0; i < 12; i++) {
+                const slotId = 'slot_' + i;
+                const itemId = placed[slotId];
+                const item = itemId ? im.itemsDatabase[itemId] : null;
+
+                const slot = document.createElement('div');
+                slot.className = `item-slot ${item ? 'occupied' : ''} ${selectedSlot === slotId ? 'selected-slot' : ''}`;
+
+                if (item) {
+                    slot.innerHTML = `<div class="item-icon">${item.icon}</div>`;
+                    slot.onclick = () => {
+                        selectedSlot = slotId;
+                        renderRoom();
+                        showInfo(item, true);
+                    };
+                } else {
+                    slot.innerHTML = `<div style="font-size: 8px; color: rgba(255,255,255,0.2);">Puste</div>`;
+                    slot.onclick = () => {
+                        selectedSlot = slotId;
+                        renderRoom();
+                        if (selectedItem) {
+                            im.placeItem(selectedItem.id, slotId);
+                            selectedItem = null;
+                            selectedSlot = null;
+                            init();
+                        } else {
+                            // If no item selected, just open inventory to pick one
+                            toggleInventory();
+                        }
+                    };
+                }
+                grid.appendChild(slot);
+            }
+        }
+
+        function showInfo(item, inRoom) {
+            const panel = document.getElementById('infoPanel');
+            panel.style.display = 'block';
+            document.getElementById('itemName').innerText = item.name.toUpperCase();
+            document.getElementById('itemDesc').innerText = item.desc;
+
+            let statsText = "";
+            if (item.stats) {
+                for (const [k, v] of Object.entries(item.stats)) {
+                    statsText += `+${v} ${k.toUpperCase()} `;
+                }
+            }
+            document.getElementById('itemStats').innerText = statsText;
+
+            const placeBtn = document.getElementById('placeBtn');
+            const removeBtn = document.getElementById('removeBtn');
+            const useBtn = document.getElementById('useBtn');
+
+            if (inRoom) {
+                placeBtn.style.display = 'none';
+                removeBtn.style.display = 'inline-block';
+
+                // ALL ITEMS USABLE (User Request V9.6)
+                useBtn.style.display = 'inline-block';
+
+                removeBtn.onclick = () => {
+                    im.removeItemFromRoom(selectedSlot);
+                    selectedSlot = null;
+                    init();
+                    hideInfo();
+                };
+
+                useBtn.onclick = () => {
+                    const res = im.usePlacedItem(selectedSlot);
+                    if (res.success) {
+                        alert(res.message);
+                        if (res.consumed) {
+                            selectedSlot = null;
+                            hideInfo();
+                        }
+                        init(); // Refresh both room and szafka
+                    } else {
+                        alert(res.message);
+                    }
+                };
+            } else {
+                placeBtn.style.display = 'inline-block';
+                removeBtn.style.display = 'none';
+                useBtn.style.display = 'none';
+                placeBtn.onclick = () => {
+                    alert("Kliknij PUSTY SLOT w pokoju, aby tam postawić przedmiot.");
+                    hideInfo();
+                };
+            }
+        }
+
+        function hideInfo() {
+            document.getElementById('infoPanel').style.display = 'none';
+        }
+
+        // Force focus for ESC key
+        window.focus();
+        init();
+    </script>
+</body>
+
+</html>

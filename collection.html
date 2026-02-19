@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kolekcja - RRB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            padding-top: 50px;
+            /* Fix for RadioBar fixed header */
+        }
+
+        /* BACK BUTTON */
+        .back-btn {
+            position: fixed;
+            top: 280px;
+            left: 20px;
+            z-index: 1000;
+            background: #ff0055;
+            color: white;
+            text-decoration: none;
+            padding: 15px 25px;
+            font-size: 10px;
+            border: 2px solid white;
+            box-shadow: 0 0 10px #ff0055;
+            font-family: 'Press Start 2P';
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            background: #ff0000;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a0a2a 0%, #0a0a0a 100%);
+            padding: 30px;
+            border-bottom: 3px solid #00ffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #00ffff;
+            font-size: 28px;
+            text-shadow: 0 0 20px #00ffff;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            color: #aaa;
+        }
+
+        .stat-value {
+            color: #00ff00;
+            margin-left: 10px;
+        }
+
+        .filters {
+            background: #1a1a1a;
+            padding: 20px 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            border-bottom: 2px solid #333;
+        }
+
+        .filter-btn {
+            background: #2a2a2a;
+            border: 2px solid #555;
+            color: #aaa;
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: #00ffff;
+            color: #00ffff;
+        }
+
+        .filter-btn.active {
+            background: #00ffff;
+            color: #000;
+            border-color: #00ffff;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            background: #2a2a2a;
+            border: 2px solid #555;
+            color: white;
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            padding: 10px 15px;
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card-container {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .card-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .card-wrapper {
+            position: relative;
+        }
+
+        .duplicate-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ff0055;
+            color: white;
+            font-size: 10px;
+            padding: 8px 12px;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 20px #ff0055;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: #555;
+        }
+
+        .empty-state h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state a {
+            color: #00ffff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .empty-state a:hover {
+            text-decoration: underline;
+        }
+
+        .actions {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #ff0099 0%, #ff00ff 100%);
+            border: none;
+            color: white;
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            padding: 15px 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 0, 255, 0.5);
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(255, 0, 255, 0.7);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <a href="#" class="back-btn" onclick="
+        event.preventDefault(); 
+        if (window.parent && window.parent.closeSubpage) {
+            window.parent.closeSubpage();
+        } else {
+            // Fallback
+            const backBtnUrlParams = new URLSearchParams(window.location.search);
+            let p = backBtnUrlParams.get('profile');
+            if (!p && window.collectionManager) p = window.collectionManager.currentProfile;
+            if (!p) p = localStorage.getItem('rrb_current_profile') || 'default';
+            window.location.href='index.html?view=playerMenu&profile='+p;
+        }
+        ">
+        🛑 WRÓĆ DO MENU
+    </a>
+    <div class="header">
+        <h1>📦 TWOJA KOLEKCJA</h1>
+        <div class="stats-bar">
+            <div class="stat-item">
+                KARTY: <span class="stat-value" id="totalCards">0</span>
+            </div>
+            <div class="stat-item">
+                UNIKALNE: <span class="stat-value" id="uniqueCards">0</span>/<span id="totalAvailable">0</span>
+            </div>
+            <div class="stat-item">
+                UKOŃCZENIE: <span class="stat-value" id="completion">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">WSZYSTKIE</button>
+        <button class="filter-btn" data-filter="RAPER" onclick="setFilter('RAPER')">RAPERZY</button>
+        <button class="filter-btn" data-filter="PŁYTA" onclick="setFilter('PŁYTA')">PŁYTY</button>
+        <button class="filter-btn" data-filter="SKŁAD" onclick="setFilter('SKŁAD')">SKŁADY</button>
+        <button class="filter-btn" data-filter="PROD.DJ.MIX" onclick="setFilter('PROD.DJ.MIX')">PROD.DJ.MIX</button>
+        <button class="filter-btn" data-filter="DZIENNIKARZ" onclick="setFilter('DZIENNIKARZ')">DZIENNIKARZE</button>
+        <input type="text" class="search-box" placeholder="SZUKAJ KARTY..." id="searchBox" oninput="applyFilters()">
+    </div>
+
+    <!-- Selected Card Indicator (Top Bar) -->
+    <div id="selectedCardBar"
+        style="background: #111; padding: 10px 30px; border-bottom: 2px solid #333; font-size: 10px; color: #aaa; display: flex; align-items: center; justify-content: space-between;">
+        <span>WYBRANA KARTA DO WALKI: <span id="currentSelectedCardName" style="color: #00ff00;">BRAK</span></span>
+    </div>
+
+    <div class="collection-grid" id="collectionGrid"></div>
+
+    <div class="actions">
+        <button class="action-btn secondary" onclick="resetCollection()">RESET</button>
+        <button class="action-btn" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: black;"
+            onclick="openEvolutionModal()">⚡ EWOLUCJE</button>
+        <button class="action-btn" onclick="
+            if(window.collectionManager) {
+                const p = window.collectionManager.currentProfile;
+                window.location.href='pack_opening.html?profile='+p;
+            } else {
+                window.location.href='pack_opening.html';
+            }">OTWÓRZ PACZKI</button>
+    </div>
+
+    <div id="evolutionModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; flex-direction: column; align-items: center; justify-content: center;">
+        <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 24px; text-shadow: 0 0 20px #FFD700;">CENTRUM
+            EWOLUCJI</h2>
+        <div id="evolutionList"
+            style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 90vw; overflow-y: auto; max-height: 80vh; padding: 20px;">
+            <!-- JS Populated -->
+        </div>
+        <button onclick="document.getElementById('evolutionModal').style.display='none'"
+            style="margin-top: 30px; background: #555; color: white; border: none; padding: 15px 40px; font-family: 'Press Start 2P'; cursor: pointer;">ZAMKNIJ</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function shareWholePage() {
+            if (window.cardGenerator && window.cardGenerator.shareFullCollection) {
+                window.cardGenerator.shareFullCollection();
+            } else {
+                alert("Funkcja udostepniania jest ladowana...");
+            }
+        }
+    </script>
+    <script src="js/AuthManager.js"></script>
+    <script src="js/data/cards.js"></script>
+    <script src="js/data/custom_labels.js"></script>
+    <script src="js/CardGenerator.js?v=75"></script>
+    <script src="js/data/tracks.js?v=75"></script>
+    <script src="js/classes/AudioManager.js?v=75"></script>
+    <script src="js/ui/RadioBar.js?v=75"></script>
+    <script src="js/CollectionManager.js"></script>
+    <script>
+        window.authManager = new AuthManager();
+        const collectionManager = new CollectionManager();
+        const cardGenerator = new CardGenerator();
+        let currentFilter = 'all';
+
+        async function initPage() {
+            // 1. Initial Load of Manager
+            await collectionManager.init();
+
+            // 2. CHECK URL PROFILE
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlProfile = urlParams.get('profile');
+            console.log('[Collection] URL Profile:', urlProfile);
+
+            if (urlProfile && urlProfile !== 'null') {
+                if (collectionManager.currentProfile !== urlProfile) {
+                    console.log("[Collection] Switching to URL profile:", urlProfile);
+                    await collectionManager.switchProfile(urlProfile);
+                }
+            }
+
+            // 3. Sync Achievements
+            if (typeof AchievementManager !== 'undefined') {
+                window.achievementManager = new AchievementManager();
+                await window.achievementManager.init();
+            }
+
+            console.log('[Collection] Init Complete. Cards:', Object.keys(collectionManager.collection.cards).length);
+
+            // 4. Update UI
+            updateStats();
+            applyFilters();
+        }
+
+        initPage();
+
+        // Update stats display
+        function updateStats() {
+            const stats = collectionManager.getStats();
+
+            document.getElementById('totalCards').textContent = stats.totalCards;
+            document.getElementById('uniqueCards').textContent = stats.uniqueCards;
+            document.getElementById('totalAvailable').textContent = stats.totalAvailable;
+            document.getElementById('completion').textContent = stats.completion + '%';
+
+            updateSelectedDisplay();
+        }
+
+        function updateSelectedDisplay() {
+            const selected = collectionManager.getSelectedCard();
+            const el = document.getElementById('currentSelectedCardName');
+            if (selected) {
+                el.textContent = selected.name + ' (' + selected.tier + ')';
+                el.style.color = '#00ff00';
+            } else {
+                el.textContent = 'BRAK';
+                el.style.color = '#555';
+            }
+        }
+
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
+
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                }
+            });
+
+            applyFilters();
+        }
+
+        // Apply filters and search
+        function applyFilters() {
+            // We pass null to renderCollection to signal it should use the full database + current filters
+            renderCollection(null);
+        }
+
+        let currentRenderId = 0;
+
+        // Render collection grid
+        async function renderCollection(cards) {
+            const grid = document.getElementById('collectionGrid');
+            const renderId = ++currentRenderId;
+
+            // 1. Determine Source List
+            let sourceList = CARDS_DATABASE;
+            if (sourceList.length === 0) {
+                grid.innerHTML = '<h2 style="color:red">ERROR: DATABASE EMPTY</h2>';
+                return;
+            }
+
+            // 2. Apply Filters
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            let filteredList = sourceList;
+
+            if (currentFilter !== 'all') {
+                filteredList = filteredList.filter(c => c.type === currentFilter);
+            }
+
+            if (searchTerm) {
+                filteredList = filteredList.filter(c =>
+                    c.name.toLowerCase().includes(searchTerm) ||
+                    c.tier.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // 3. Handle Empty State
+            if (filteredList.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <h2>🚫 BRAK KART</h2>
+                        <p>Nie znaleziono kart spełniających kryteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 6. Sorting: Owned First, then Tier
+            const tierOrder = { 'GOAT': 0, 'ICON': 1, 'STAR': 2, 'MAINSTREAM': 3, 'UNDERGROUND': 4 };
+            filteredList.sort((a, b) => {
+                const ownedA = collectionManager.getCardCount(a.id) > 0 ? 1 : 0;
+                const ownedB = collectionManager.getCardCount(b.id) > 0 ? 1 : 0;
+                if (ownedA !== ownedB) return ownedB - ownedA; // Owned first
+                const tierA = tierOrder[a.tier] || 99;
+                const tierB = tierOrder[b.tier] || 99;
+                return tierA - tierB;
+            });
+
+            // 7. Render Loop
+            grid.innerHTML = '';
+
+            for (const card of filteredList) {
+                // Check if we've been superseded by a newer render
+                if (renderId !== currentRenderId) return;
+
+                const ownedCount = collectionManager.getCardCount(card.id);
+                const isOwned = ownedCount > 0;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'card-wrapper';
+
+                if (!isOwned) {
+                    wrapper.style.filter = 'grayscale(100%) opacity(0.4)';
+                    wrapper.style.transform = 'scale(0.95)';
+
+                    const lock = document.createElement('div');
+                    lock.innerHTML = '🔒';
+                    lock.style.position = 'absolute';
+                    lock.style.top = '50%';
+                    lock.style.left = '50%';
+                    lock.style.transform = 'translate(-50%, -50%)';
+                    lock.style.fontSize = '40px';
+                    lock.style.textShadow = '0 0 10px black';
+                    wrapper.appendChild(lock);
+                } else {
+                    const isSelectable = ['RAPER', 'DZIENNIKARZ', 'PROD.DJ.MIX'].includes(card.type);
+                    if (isSelectable) {
+                        wrapper.style.cursor = 'pointer';
+                        wrapper.onclick = () => selectForFight(card.id);
+                    }
+                }
+
+                if (ownedCount > 1) {
+                    const badge = document.createElement('div');
+                    badge.className = 'duplicate-badge';
+                    badge.textContent = `x${ownedCount}`;
+                    wrapper.appendChild(badge);
+                }
+
+                const cardElement = await cardGenerator.generateCardElement(card);
+
+                // FINAL CHECK AFTER AWAIT
+                if (renderId !== currentRenderId) return;
+
+                wrapper.appendChild(cardElement);
+
+                const isSelected = String(collectionManager.selectedCardId) === String(card.id);
+
+                if (isSelected) {
+                    wrapper.style.border = '4px solid #00ff00';
+                    wrapper.style.boxShadow = '0 0 25px #00ff00';
+                    wrapper.style.transform = 'scale(1.05)';
+                    wrapper.style.zIndex = '10';
+
+                    const selectedLabel = document.createElement('div');
+                    selectedLabel.innerText = "✓ WYBRANA";
+                    selectedLabel.style.cssText = "position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); color: #00ff00; font-size: 12px; width: 100%; text-align: center; text-shadow: 0 0 5px #000; font-weight: bold;";
+                    wrapper.appendChild(selectedLabel);
+                } else if (isOwned) {
+                    const isSelectable = ['RAPER', 'DZIENNIKARZ', 'PROD.DJ.MIX'].includes(card.type);
+                    if (isSelectable) {
+                        const btn = document.createElement('button');
+                        btn.innerText = "WYBIERZ";
+                        btn.style.cssText = "position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; border: 1px solid #555; font-size: 8px; cursor: pointer; padding: 2px 5px;";
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            selectForFight(card.id);
+                        };
+                        wrapper.appendChild(btn);
+                    }
+                }
+
+                grid.appendChild(wrapper);
+            }
+        }
+
+        function selectForFight(cardId) {
+            if (collectionManager.selectCard(cardId)) {
+                // Refresh view to show outline
+                updateStats(); // Updates top bar
+                applyFilters(); // Re-renders grid
+            }
+        }
+
+        // Reset collection (for testing)
+        function resetCollection() {
+            if (confirm('CZY NA PEWNO CHCESZ ZRESETOWAĆ KOLEKCJĘ?')) {
+                collectionManager.reset();
+                updateStats();
+                applyFilters();
+                alert('KOLEKCJA ZRESETOWANA!');
+            }
+        }
+
+        // Initialize
+        updateStats();
+        applyFilters();
+
+        // Evolution Logic
+        function openEvolutionModal() {
+            const modal = document.getElementById('evolutionModal');
+            const list = document.getElementById('evolutionList');
+            list.innerHTML = '';
+            modal.style.display = 'flex';
+
+            const potentialEvolves = [];
+            const processedRappers = new Set();
+
+            CARDS_DATABASE.forEach(card => {
+                if (card.tier === 'UNDERGROUND' && card.type === 'RAPER') {
+                    const baseId = card.id.replace('_underground', '');
+                    if (!processedRappers.has(baseId)) {
+                        processedRappers.add(baseId);
+                        if (collectionManager.canEvolve(baseId)) {
+                            potentialEvolves.push(card);
+                        }
+                    }
+                }
+            });
+
+            if (potentialEvolves.length === 0) {
+                list.innerHTML = '<div style="color: #888;">BRAK DOSTĘPNYCH EWOLUCJI.<br>ZBIERZ 4 TIERY RAPERA ABY GO ULEPSZYĆ!</div>';
+                return;
+            }
+
+            potentialEvolves.forEach(async (card) => {
+                const baseId = card.id.replace('_underground', '');
+
+                const div = document.createElement('div');
+                div.style.cssText = 'background: #222; border: 2px solid #FFD700; padding: 20px; text-align: center; border-radius: 10px; width: 250px;';
+
+                div.innerHTML = `
+                    <h3 style="color: white; margin-bottom: 15px; font-size: 14px;">${card.name}</h3>
+                    <div style="font-size: 10px; color: #aaa; margin-bottom: 15px;">
+                        Wymaga: <span style="color: #888;">UG</span> + <span style="color: #0f0;">MAIN</span> + <span style="color: #a0f;">STAR</span> + <span style="color: #fa0;">ICON</span>
+                    </div>
+                    <div style="font-size: 12px; color: #FFD700; margin-bottom: 15px;">
+                        Nagroda: G.O.A.T. CARD
+                    </div>
+                `;
+
+                const btn = document.createElement('button');
+                btn.innerText = "EWOLUUJ";
+                btn.style.cssText = "background: #FFD700; color: black; border: none; padding: 10px 20px; font-family: 'Press Start 2P'; cursor: pointer; width: 100%;";
+                btn.onclick = () => {
+                    if (collectionManager.evolveRapper(baseId)) {
+                        alert(`EWOLUCJA UDANA! OTRZYMANO KARTĘ G.O.A.T. ${card.name}!`);
+                        openEvolutionModal(); // Refresh
+                        updateStats();
+                        applyFilters();
+                    } else {
+                        alert("BŁĄD: BRAK WYMAGANYCH KART!");
+                    }
+                };
+
+                div.appendChild(btn);
+                list.appendChild(div);
+            });
+        }
+    </script>
+</body>
+
+</html>

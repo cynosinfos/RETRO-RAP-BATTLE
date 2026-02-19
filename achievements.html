@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievementy - RRB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a0a2a 100%);
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            padding-top: 50px;
+            /* Space for Radio Bar */
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 3px solid #ffd700;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        h1 {
+            color: #ffd700;
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px #ffd700;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 10px;
+        }
+
+        .stat-value {
+            color: #ffd700;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .controls {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #333;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #666;
+            color: #aaa;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .filter-btn.active {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: #ffd700;
+            color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .achievement-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 3px solid;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .achievement-card.locked {
+            opacity: 0.8;
+            filter: grayscale(100%);
+            border-color: #444 !important;
+        }
+
+        .achievement-card.unlocked {
+            cursor: pointer;
+        }
+
+        .achievement-card.unlocked:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .achievement-icon {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .achievement-name {
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 10px;
+            min-height: 36px;
+        }
+
+        .achievement-desc {
+            color: #888;
+            font-size: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            min-height: 48px;
+        }
+
+        .achievement-card.locked .achievement-desc {
+            color: #555;
+        }
+
+        .tier-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 7px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .secret-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #333;
+            color: #888;
+            padding: 5px 10px;
+            font-size: 7px;
+            border-radius: 3px;
+        }
+
+        .progress-bar {
+            background: #222;
+            height: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 1px solid #444;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700 0%, #ffaa00 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            color: #000;
+        }
+
+        .reward-section {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid #ffaa00;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .reward-text {
+            color: #ffaa00;
+            font-size: 9px;
+        }
+
+        .claim-btn {
+            background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
+            border: none;
+            color: #000;
+            padding: 8px 20px;
+            font-family: 'Press Start 2P';
+            font-size: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .claim-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        .claim-btn.claimed {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            background: rgba(255, 0, 85, 0.8);
+            border: 2px solid #ff0055;
+            color: white;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            cursor: pointer;
+            z-index: 1000;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #ff0055;
+            box-shadow: 0 0 20px #ff0055;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: #666;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="back-btn"
+        onclick="if (window.parent && window.parent.closeSubpage) { window.parent.closeSubpage(); } else { const p = localStorage.getItem('rrb_current_profile'); window.location.href='index.html?view=playerMenu&profile='+p; }">←
+        POWRÓT DO MENU</button>
+
+    <div class="header">
+        <h1>🏆 ACHIEVEMENTY</h1>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div>ODBLOKOWANE</div>
+                <div class="stat-value" id="statUnlocked">0/60</div>
+            </div>
+            <div class="stat-item">
+                <div>UKONCZONE</div>
+                <div class="stat-value" id="statCompletion">0%</div>
+            </div>
+            <div class="stat-item">
+                <div>PUNKTY</div>
+                <div class="stat-value" id="statPoints">0</div>
+            </div>
+            <div class="stat-item">
+                <div>DO ODEBRANIA</div>
+                <div class="stat-value" id="statUnclaimed">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="filter-btn active" data-category="all">WSZYSTKIE</button>
+        <button class="filter-btn" data-category="CARDS">KARTY</button>
+        <button class="filter-btn" data-category="PACKS">PACZKI</button>
+        <button class="filter-btn" data-category="FIGHTS">WALKI</button>
+        <button class="filter-btn" data-category="ECONOMY">EKONOMIA</button>
+        <button class="filter-btn" data-category="COLLECTION">KOLEKCJA</button>
+        <button class="filter-btn" data-category="unlocked">ODBLOKOWANE</button>
+        <button class="filter-btn" data-category="locked">ZABLOKOWANE</button>
+    </div>
+
+    <div class="achievements-grid" id="achievementsGrid"></div>
+
+    <script src="js/AuthManager.js?v=75"></script>
+    <script src="js/data/cards.js?v=75"></script>
+    <script src="js/data/achievements.js?v=75"></script>
+    <script src="js/data/tracks.js?v=75"></script>
+    <script src="js/classes/AudioManager.js?v=75"></script>
+    <script src="js/ui/RadioBar.js?v=75"></script>
+    <script src="js/CollectionManager.js?v=75"></script>
+    <script src="js/AchievementManager.js?v=75"></script>
+    <script>
+        window.authManager = new AuthManager();
+        window.collectionManager = new CollectionManager();
+        window.achievementManager = new AchievementManager();
+        let currentFilter = 'all';
+
+        async function initPage() {
+            console.log("[Achievements] Starting Async Init...");
+            await window.collectionManager.init();
+            await window.achievementManager.init();
+
+            // Sync with collection first
+            window.achievementManager.syncWithCollection(window.collectionManager);
+
+            // CHECK URL PROFILE
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlProfile = urlParams.get('profile');
+
+            if (urlProfile && urlProfile !== 'null') {
+                if (window.collectionManager.currentProfile !== urlProfile) {
+                    console.log("[Achievements] Switching to URL profile:", urlProfile);
+                    await window.collectionManager.switchProfile(urlProfile);
+                }
+            }
+
+            console.log("[Achievements] Init Complete. Rendering...");
+            setupFilters();
+            renderAchievements();
+            updateStats();
+
+            // DEBUG
+            console.log("DEBUG: Total achievements loaded:", window.achievementManager.achievements.length);
+            console.log("DEBUG: First achievement:", window.achievementManager.achievements[0]);
+            console.log("DEBUG: Last achievement:", window.achievementManager.achievements[window.achievementManager.achievements.length - 1]);
+        }
+
+        initPage();
+
+        // Setup filter buttons
+        function setupFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.category;
+                    renderAchievements();
+                });
+            });
+        }
+
+        // Render achievements grid
+        function renderAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = '';
+
+            // USE PARENT MANAGER IF AVAILABLE (FIX SYNC ISSUES)
+            const mgr = (window.parent && window.parent.achievementManager) ?
+                window.parent.achievementManager : window.achievementManager;
+
+            let achievements = mgr.getAllAchievements();
+
+            // Filter
+            if (currentFilter !== 'all') {
+                if (currentFilter === 'unlocked') {
+                    achievements = achievements.filter(a => a.unlocked);
+                } else if (currentFilter === 'locked') {
+                    achievements = achievements.filter(a => !a.unlocked);
+                } else {
+                    achievements = achievements.filter(a => a.cat === currentFilter);
+                }
+            }
+
+            if (achievements.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h2>🔒 BRAK ACHIEVEMENTÓW</h2>
+                        <p>Nie ma achievementów w tej kategorii</p>
+                    </div>
+                `;
+                return;
+            }
+
+            achievements.forEach(achievement => {
+                const card = createAchievementCard(achievement);
+                grid.appendChild(card);
+            });
+        }
+
+        // Create achievement card
+        function createAchievementCard(achievement) {
+            const card = document.createElement('div');
+            card.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+
+            const tierColor = ACHIEVEMENT_TIERS[achievement.tier].color;
+            card.style.borderColor = tierColor;
+
+            let rewardHtml = '';
+            if (achievement.reward) {
+                const claimed = achievement.rewardClaimed;
+                rewardHtml = `
+                    <div class="reward-section">
+                        <div class="reward-text">
+                            ${achievement.reward.mk ? `💰 ${achievement.reward.mk} MK` : ''}
+                            ${achievement.reward.pack ? ` | 📦 ${achievement.reward.pack}` : ''}
+                        </div>
+                        ${achievement.unlocked && !claimed ?
+                        `<button class="claim-btn" onclick="claimReward('${achievement.id}')">ODBIERZ</button>` :
+                        claimed ? `<button class="claim-btn claimed">ODEBRANE</button>` : ''
+                    }
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="tier-badge" style="background: ${tierColor}; color: #000;">
+                    ${achievement.tier}
+                </div>
+                ${achievement.secret ? '<div class="secret-badge">🔒 SECRET</div>' : ''}
+                <div class="achievement-icon">${achievement.icon}</div>
+                <div class="achievement-name">${achievement.name}</div>
+                <div class="achievement-desc">${achievement.unlocked || !achievement.secret ? achievement.desc : '???'}</div>
+                
+                ${!achievement.unlocked ? `
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${achievement.progress.percentage}%">
+                            ${achievement.progress.current}/${achievement.progress.target}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${rewardHtml}
+            `;
+
+            return card;
+        }
+
+        // Claim reward
+        function claimReward(achievementId) {
+            // USE PARENT MANAGER
+            const mgr = (window.parent && window.parent.achievementManager) ?
+                window.parent.achievementManager : window.achievementManager;
+
+            const reward = mgr.claimReward(achievementId);
+            if (!reward) return;
+
+            let msg = "ODEBRANO NAGRODE:\n";
+            if (reward.mk) msg += `- ${reward.mk} MK\n`;
+            if (reward.pack) msg += `- PACZKA: ${reward.pack}\n`;
+
+            alert(msg);
+
+            // Refresh UI
+            renderAchievements();
+            updateStats();
+        }
+
+        // Update stats
+        function updateStats() {
+            const mgr = (window.parent && window.parent.achievementManager) ?
+                window.parent.achievementManager : window.achievementManager;
+
+            const stats = mgr.getStats();
+            document.getElementById('statUnlocked').textContent = `${stats.unlocked}/${stats.total}`;
+            document.getElementById('statCompletion').textContent = `${stats.completion}%`;
+            document.getElementById('statPoints').textContent = stats.points;
+            document.getElementById('statUnclaimed').textContent = stats.unclaimed;
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+
+</html>

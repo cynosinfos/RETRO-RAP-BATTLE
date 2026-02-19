@@ -1,0 +1,43 @@
+<!-- POPRAWNY PLIK - WERSJA 52 - EDYTOWANY PRZEZ AI -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fighting Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=54">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(err => console.log('SW failed', err));
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <!-- News Ticker (Global) -->
+    <div id="newsTickerBar" style="display: none;">
+        <div id="newsClock">00:00</div>
+        <div id="newsContent">LADOWANIE RAP NEWS...</div>
+    </div>
+
+    <!-- Error Console (Hidden by default) -->
+    <div id="error-console"
+        style="position: fixed; top: 0; left: 0; width: 100%; background: rgba(255,0,0,0.8); color: white; z-index: 9999; font-family: monospace; padding: 10px; display: none; pointer-events: none;">
+    </div>
+    <script>
+        window.onerror = function (message, source, lineno, colno, error) {
+            const consoleDiv = document.getElementById('error-console');
+            consoleDiv.style.display = 'block';
+            consoleDiv.innerHTML += `<div>Error: ${message} at ${source}:${lineno}</div>`;
+        };
+    </script>
