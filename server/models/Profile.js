@@ -30,6 +30,8 @@ const ProfileSchema = new mongoose.Schema({
         totalSpentSP: { type: Number, default: 0 }
     },
     updated_at: { type: Date, default: Date.now }
+}, {
+    suppressReservedKeysWarning: true
 });
 
 module.exports = mongoose.model('Profile', ProfileSchema);
