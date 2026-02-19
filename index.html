@@ -13,10 +13,25 @@
     <link rel="stylesheet" href="style.css?v=89">
     <link rel="manifest" href="manifest.json">
     <script>
+        // NUCLEAR CACHE BUST: Unregister all service workers if version doesn't match
+        const CURRENT_VERSION = 'v1.6.2';
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    if (!registration.active || !registration.active.scriptURL.includes('v=100')) {
+                        registration.unregister().then(() => {
+                            console.log('Old SW unregistered, reloading...');
+                            window.location.reload();
+                        });
+                    }
+                }
+            });
+        }
+
         if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js?v=99')
-                    .then(registration => console.log('SW registered'))
+                navigator.serviceWorker.register('service-worker.js?v=100')
+                    .then(registration => console.log('SW v100 registered'))
                     .catch(err => console.log('SW failed', err));
             });
         }
