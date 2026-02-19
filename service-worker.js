@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fighter-v2.2-force-refresh';
+const CACHE_NAME = 'fighter-v3.0-final-bust';
 const ASSETS = [
   './',
   './index.html',
@@ -36,7 +36,22 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  // Use Network-First strategy
   e.respondWith(
-    caches.match(e.request).then((response) => response || fetch(e.request))
+    fetch(e.request)
+      .then((response) => {
+        // If successful, update the cache
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(e.request, responseClone);
+          });
+        }
+        return response;
+      })
+      .catch(() => {
+        // If network fails, try cache
+        return caches.match(e.request);
+      })
   );
 });
