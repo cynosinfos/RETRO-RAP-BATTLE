@@ -100,10 +100,10 @@ router.post('/login', async (req, res) => {
 });
 
 // Import protect middleware for the sync route
-const { protect } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 
 // Sync Profile (Autosave endpoint)
-router.put('/profile/sync', protect, async (req, res) => {
+router.put('/profile/sync', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id; // From protect middleware
         const { collection, economy, achievements, stats, inventory, perks } = req.body;

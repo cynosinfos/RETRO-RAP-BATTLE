@@ -44,7 +44,7 @@ const PRODUCERS_LIST = [
     { id: 'waco', name: 'Waco', img: 'waco', social: { spotify: 'https://spoti.fi/3zBqIoN', instagram: 'https://www.instagram.com/waco_swiezy_material/', youtube: 'https://www.youtube.com/@wacobeats' } },
     { id: 'matheo', name: 'Matheo', img: 'matheo', social: { instagram: 'https://www.instagram.com/officialmatheo', youtube: 'https://www.youtube.com/@MatheoProductions', spotify: 'https://open.spotify.com/search/Matheo' } },
     { id: 'zeppy_zep', name: 'Zeppy Zep', img: 'zeppy_zep', social: { spotify: 'https://open.spotify.com/search/Zeppy%20Zep', instagram: 'https://www.instagram.com/zeppyzep', youtube: 'https://www.youtube.com/@zeppyzep' } },
-    { id: 'sir_mich', name: 'Sir Mich', img: 'sir_mich', social: { instagram: 'https://www.instagram.com/sirmich1914/', youtube: 'https://www.youtube.com/@SirMich', spotify: 'https://open.spotify.com/search/Sir%20Mich' } }
+
 ];
 
 // Journalists List (Media personalities)
@@ -52,7 +52,7 @@ const PRODUCERS_LIST = [
 const JOURNALISTS_LIST = [
     { id: 'yurkosky', name: 'Yurkosky', img: 'yurkosky', social: { youtube: 'https://www.youtube.com/c/Yurkosky', instagram: 'https://www.instagram.com/yurkosky_official/' } },
 
-    { id: 'bartek_biegun', name: 'Bartek Biegun', img: 'BARTEK_BIEGUN', social: { instagram: 'https://www.instagram.com/biegun.b/', spotify: 'https://open.spotify.com/playlist/42ymvhFCUMVlxoPGFVjV8T?si=9b6d43525c9144b0' } },
+    { id: 'bartek_biegun', name: 'Bartek Biegun', img: 'bartek_biegun', social: { instagram: 'https://www.instagram.com/biegun.b/', spotify: 'https://open.spotify.com/playlist/42ymvhFCUMVlxoPGFVjV8T?si=9b6d43525c9144b0' } },
     { id: 'lil_konon', name: 'Lil Konon', img: 'lil_konon', social: { instagram: 'https://www.instagram.com/lil.konon/', youtube: 'https://www.youtube.com/@LILKONOON', twitch: 'https://www.twitch.tv/lilkonoon', spotify: 'https://open.spotify.com/show/4zU...' } },
     { id: 'hype', name: 'Hype', img: 'hype', social: { youtube: 'https://www.youtube.com/@TurtleHype' } },
 
@@ -105,7 +105,7 @@ const RAPPERS_LIST = [
     { id: 'bonus_rpk', name: 'Bonus RPK', img: 'bonus_rpk', social: { spotify: 'https://open.spotify.com/artist/2Id9v8R7pS6ZfH08n5I8Hh', instagram: 'https://www.instagram.com/bonusrpk_oficjalnie/', youtube: 'https://www.youtube.com/@CiemnaStrefa' } },
     { id: 'bialas', name: 'Białas', img: 'bialas', social: { spotify: 'https://open.spotify.com/artist/2Id9v8R7pS6ZfH08n5I8Hh', instagram: 'https://www.instagram.com/bialas_h8me/', youtube: 'https://www.youtube.com/@SBMlabel' } },
     { id: 'sentino', name: 'Sentino', img: 'sentino', social: { spotify: 'https://open.spotify.com/artist/1Kjs5u8GQf6zCFdTj6SI9E', instagram: 'https://www.instagram.com/sentinobln/', youtube: 'https://www.youtube.com/@SentinoOfficial' } },
-    { id: 'malik', name: 'Malik Montana', img: 'malik', social: { spotify: 'https://open.spotify.com/artist/1Kjs5u8GQf6zCFdTj6SI9E', instagram: 'https://www.instagram.com/donmalikmontana/', youtube: 'https://www.youtube.com/@MalikMontanaOfficial' } },
+    { id: 'malik', name: 'Malik', img: 'malik', social: { spotify: 'https://open.spotify.com/artist/1Kjs5u8GQf6zCFdTj6SI9E', instagram: 'https://www.instagram.com/donmalikmontana/', youtube: 'https://www.youtube.com/@MalikMontanaOfficial' } },
     { id: 'borixon', name: 'Borixon', img: 'borixon', social: { spotify: 'https://open.spotify.com/artist/3Sg3RkI0O4Cg2P1D1Gj0E8', instagram: 'https://www.instagram.com/borixon_newbadline/', youtube: 'https://www.youtube.com/@spacerlabel' } },
     { id: 'liroy', name: 'Liroy', img: 'liroy', social: { instagram: 'https://www.instagram.com/liroy_marzec/', youtube: 'https://www.youtube.com/@liroyPolska', spotify: 'https://open.spotify.com/search/Liroy' } },
     { id: 'pih', name: 'Pih', img: 'pih', social: { instagram: 'https://www.instagram.com/pihszou/', spotify: 'https://open.spotify.com/search/Pih' } },

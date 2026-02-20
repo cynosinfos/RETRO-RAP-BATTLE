@@ -579,7 +579,7 @@
         scale: 0.8,
         offset: { x: 100, y: 50 },
         spriteSheetData: {
-            imageSrc: './img/catch_up_8x8.png',
+            imageSrc: './img/catchup_8x8.png',
             framesMax: 8,
             rows: 8,
             states: {
