@@ -36,7 +36,7 @@ const PRODUCERS_LIST = [
     { id: 'forxst', name: 'Forxst', img: 'forxst', social: { instagram: 'https://www.instagram.com/forxst/', spotify: 'https://open.spotify.com/artist/4t8zhFslMZ1y2XQo6uirep?si=SGHKzhIlRUyvs2o4vwftxA' } },
     { id: 'francis', name: 'Francis', img: 'francis', social: { spotify: 'https://open.spotify.com/artist/6HdxibJzoNkDUUDHagx3Ko?si=8Tc3VI1eQUGsR5KdL0J_VQ', instagram: 'https://www.instagram.com/bonjour.francis/' } },
     { id: 'jonatan', name: 'Jonatan', img: 'jonatan', social: { spotify: 'https://open.spotify.com/artist/2dLhpezBEgAELn73fiMEak?si=3qeLWs1jRM2kUZ85g_5OgA', instagram: 'https://www.instagram.com/jonatan.music/' } },
-    { id: 'lanek', name: 'Lanek', img: 'lanek', social: { instagram: 'https://www.instagram.com/LANEK1/', spotify: 'https://open.spotify.com/artist/7afPAbg5jb45KFUSnHIMFG?si=ST1VeAw_TM6-VxJIUg9TvQ' } },
+    { id: 'lanek', name: 'Lanek', img: 'lanek', social: { instagram: 'https://www.instagram.com/lanek_1/', spotify: 'https://open.spotify.com/artist/7afPAbg5jb45KFUSnHIMFG?si=ST1VeAw_TM6-VxJIUg9TvQ' } },
     { id: 'magiera', name: 'Magiera', img: 'magiera', social: { spotify: 'https://open.spotify.com/artist/3OFZwEYEAKMEmUheZ8TKso?si=yeunq1JxTlGtKMkngvB-0Q', instagram: 'https://www.instagram.com/magierski_71/' } },
     { id: 'noon', name: 'Noon', img: 'noon', social: { instagram: 'https://www.instagram.com/noon_pentasix/', youtube: 'https://www.youtube.com/channel/NoweNagrania' } },
     { id: 'pawbeats', name: 'Pawbeats', img: 'pawbeats', social: { instagram: 'https://www.instagram.com/pawbeats/', youtube: 'https://www.youtube.com/@Pawbeats' } },
