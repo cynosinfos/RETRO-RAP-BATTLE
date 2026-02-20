@@ -72,6 +72,19 @@ class NetworkManager {
                 window.updateSideSelectionUI();
             }
 
+            // HOST LOGIC: If I am Host (P1/Index 0) and a Guest (P2/Index 1) joined...
+            // AND we are not already in game...
+            if (this.playerIndex === 0 && data.playerIndex === 1) {
+                console.log("Guest joined! Initiating Game Sequence for Host...");
+                // 1v1 Logic: Go to Char Select
+                if (window.gameMode !== '2V2_CHAOS') {
+                    if (typeof window.startOnlineGame === 'function') {
+                        // Small delay to ensure Guest is ready receiving events?
+                        setTimeout(() => window.startOnlineGame(), 500);
+                    }
+                }
+            }
+
             if (data.playerId !== this.socket.id) {
                 // Alert only if game already starting or significant event? 
                 // For 4 player lobby, maybe just update UI instead of alert spam.
@@ -152,6 +165,11 @@ class NetworkManager {
             this.roomId = roomId
             if (this.socket && this.socket.connected) {
                 this.socket.emit('joinRoom', roomId);
+
+                // SAFETY: If we are joining via code, ensure we are in correct mode locally
+                if (window.gameMode !== '2V2_CHAOS') {
+                    window.gameMode = 'ONLINE';
+                }
             } else {
                 console.error('[NetworkManager] Socket not connected yet for joinRoom');
             }

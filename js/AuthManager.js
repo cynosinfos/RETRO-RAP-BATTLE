@@ -3,12 +3,20 @@ class AuthManager {
         // Render production URL - Ensure this matches your Render service!
         const renderUrl = 'https://retro-rap-battle.onrender.com';
 
+        // Use localhost if running locally, otherwise use Render OR relative path
+        // If we are on rrbt.pl, we might need to hit the Render URL directly if the backend isn't proxied.
+        // Assuming rrbt.pl is just static files, we MUST hit Render.
+
         // Use localhost if running locally, otherwise use Render
         const isLocal = window.location.hostname === 'localhost' ||
-            window.location.hostname === '127.0.0.1' ||
-            window.location.protocol === 'file:';
+            window.location.hostname === '127.0.0.1';
 
-        this.apiBase = isLocal ? 'http://localhost:3000/api' : `${renderUrl}/api`;
+        // FORCE HTTPS for Render if not local. 
+        // NOTE: If serving from rrbt.pl (http/https), we need to hit the backend at Render.
+        this.apiBase = isLocal ? 'http://localhost:3000/api' : 'https://retro-rap-battle.onrender.com/api';
+
+        console.log(`[AuthManager] Initialized. API Base: ${this.apiBase}`);
+
         this.token = localStorage.getItem('jwt_token');
 
         // Restore currentUser from localStorage if exists

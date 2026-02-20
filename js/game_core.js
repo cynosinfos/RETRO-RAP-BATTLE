@@ -3154,6 +3154,7 @@ function handleMainMenuSelection() {
 
         if (mainMenuIndex === 3) {
             // Lobby
+            gameMode = 'ONLINE'; // FORCE RESET gameMode to avoid 2v2 leak
             document.getElementById('onlineLobbySection').style.display = 'flex'
             document.getElementById('onlineQuickMatchSection').style.display = 'none'
         } else if (mainMenuIndex === 4) {
