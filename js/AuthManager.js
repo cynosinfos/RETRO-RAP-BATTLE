@@ -59,6 +59,10 @@ class AuthManager {
                 localStorage.setItem('jwt_token', data.token);
                 this.currentUser = data.user;
                 localStorage.setItem('user_info', JSON.stringify(data.user));
+
+                // Initialize SaveManager
+                window.saveManager = new SaveManager();
+
                 return { success: true };
             } else {
                 return { success: false, message: data.message };
@@ -84,6 +88,10 @@ class AuthManager {
                 localStorage.setItem('jwt_token', data.token);
                 this.currentUser = data.user;
                 localStorage.setItem('user_info', JSON.stringify(data.user)); // Persist user info
+
+                // Initialize SaveManager
+                window.saveManager = new SaveManager();
+
                 return { success: true };
             } else {
                 return { success: false, message: data.message };
@@ -111,6 +119,12 @@ class AuthManager {
     }
 
     logout() {
+        if (window.saveManager) {
+            // Force a final sync before clearing everything
+            window.saveManager.syncProfile();
+            window.saveManager.stopAutosave();
+        }
+
         this.token = null;
         this.currentUser = null;
         localStorage.removeItem('jwt_token');

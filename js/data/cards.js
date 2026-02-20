@@ -135,7 +135,7 @@ const RAPPERS_LIST = [
     { id: 'arab', name: 'Arab', img: 'arab', social: { instagram: 'https://www.instagram.com/gabrys_arabski/', youtube: 'https://www.youtube.com/@ARABTV', spotify: 'https://open.spotify.com/search/Arab' } },
     { id: 'astek', name: 'Astek', img: 'astek', social: { instagram: 'https://www.instagram.com/dwaslawy/', youtube: 'https://www.youtube.com/@dwaslawy', spotify: 'https://open.spotify.com/search/Astek' } },
     { id: 'atutowy', name: 'Atutowy', img: 'atutowy', social: { instagram: 'https://www.instagram.com/atutowy/', spotify: 'https://open.spotify.com/search/Atutowy' } },
-    { id: 'bardal', name: 'Barrdal', img: 'barrdal', social: { spotify: 'https://open.spotify.com/search/Barrdal', instagram: '', youtube: '' } },
+    { id: 'bardal', name: 'Bardal', img: 'bardal', social: { spotify: 'https://open.spotify.com/search/Bardal', instagram: '', youtube: '' } },
     { id: 'belmondo', name: 'Belmondo', img: 'belmondo', social: { spotify: 'https://open.spotify.com/search/Belmondawg', instagram: 'https://www.instagram.com/belmondawg', youtube: '' } },
     { id: 'biak', name: 'Biak', img: 'biak', social: { spotify: 'https://open.spotify.com/search/Biak', instagram: '', youtube: '' } },
     { id: 'bilon', name: 'Bilon', img: 'bilon', social: { instagram: 'https://www.instagram.com/belmondawg', youtube: 'https://www.youtube.com/@DIILTV', spotify: 'https://open.spotify.com/search/Biak' } },
@@ -244,7 +244,7 @@ PRODUCERS_LIST.forEach(producer => {
             },
             effect: `Moc: ${Math.floor(tier.statMult * 10)}%`,
             imagePath: `img/${producer.img}_8x8.png`,
-            social: { spotify: 'https://open.spotify.com/search/2cztery7', instagram: '', youtube: '' }
+            social: producer.social || { spotify: '', instagram: '', youtube: '' }
         });
     });
     CARDS_DATABASE.push({
@@ -256,7 +256,7 @@ PRODUCERS_LIST.forEach(producer => {
         effect: 'LEGENDARNA MOC',
         imagePath: `img/${producer.img}_8x8.png`,
         isCraftable: true,
-        social: { spotify: '', instagram: '', youtube: '' }
+        social: producer.social || { spotify: '', instagram: '', youtube: '' }
     });
 });
 
@@ -322,7 +322,7 @@ JOURNALISTS_LIST.forEach(journalist => {
             },
             effect: `Moc: ${Math.floor(tier.statMult * 10)}%`,
             imagePath: `img/${journalist.img}_8x8.png`,
-            social: { spotify: '', instagram: '', youtube: '' }
+            social: journalist.social || { spotify: '', instagram: '', youtube: '' }
         });
     });
 
@@ -336,7 +336,7 @@ JOURNALISTS_LIST.forEach(journalist => {
         effect: 'LEGENDARNA MOC',
         imagePath: `img/${journalist.img}_8x8.png`,
         isCraftable: true,
-        social: { spotify: '', instagram: '', youtube: '' }
+        social: journalist.social || { spotify: '', instagram: '', youtube: '' }
     });
 });
 

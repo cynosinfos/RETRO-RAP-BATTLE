@@ -115,8 +115,7 @@ class CollectionManager {
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.collection) {
-                        console.log("[CollectionManager] Loaded from API");
-                        // console.log("RAW API DATA:", JSON.stringify(data)); 
+                        console.log("[CollectionManager] Loaded exactly from API");
 
                         // Transform Cards Array -> Map/Object
                         const cardsMap = {};
@@ -125,44 +124,16 @@ class CollectionManager {
                                 cardsMap[c.id] = c.count;
                             });
                         } else {
-                            Object.assign(cardsMap, data.collection.cards);
+                            Object.assign(cardsMap, data.collection.cards || {});
                         }
 
-                        // Merge economy & collection
+                        // Set directly from Server
                         const serverMerged = {
                             cards: cardsMap,
-                            selected_card_id: data.collection.selected_card_id,
-                            money: data.economy.money,
-                            totalCards: this.countTotalCards(cardsMap) // Pass the map
+                            selected_card_id: data.collection.selected_card_id || null,
+                            money: data.economy ? data.economy.money : 0,
+                            totalCards: this.countTotalCards(cardsMap)
                         };
-
-                        // CHECK LOCAL DATA FOR CONFLICT/NEWER VERSION
-                        const localRaw = localStorage.getItem(this.storageKey);
-                        if (localRaw) {
-                            try {
-                                const localData = JSON.parse(localRaw);
-                                const localTotal = localData.totalCards || 0;
-                                const serverTotal = serverMerged.totalCards || 0;
-
-                                console.log(`[CollectionManager] Sync Check: Local(${localTotal}) vs Server(${serverTotal})`);
-
-                                // HEURISTIC: If Local has MORE cards, assume Server is stale (failed save)
-                                // Prevent Overwrite!
-                                if (localTotal > serverTotal) {
-                                    console.warn(`[CollectionManager] CONFLICT! Local(${localTotal}) > Server(${serverTotal}). PRESERVING LOCAL.`);
-
-                                    // Force sync local -> server
-                                    setTimeout(() => {
-                                        console.log("[CollectionManager] Forcing upstream sync to resolve conflict...");
-                                        this.saveCollection();
-                                    }, 2000);
-
-                                    return localData;
-                                }
-                            } catch (e) {
-                                console.error("Local check error:", e);
-                            }
-                        }
 
                         // Sync Achievements
                         if (window.achievementManager) {
@@ -185,25 +156,16 @@ class CollectionManager {
                                 window.perkManager.importData(data.perks || {});
                             } else {
                                 window.perkManager.perks = data.perks || { learned: [], totalSpentSP: 0 };
-                                window.perkManager.savePerks();
+                                window.perkManager.savePerks(); // local persistence of perks for iframe
                             }
                         }
 
                         // Update Selected Card ID
-                        // ONLY update if server has a value. Don't let it clear a local selection.
                         if (data.collection && data.collection.selected_card_id) {
-                            console.log(`[CollectionManager] Updating selection from API: ${data.collection.selected_card_id}`);
                             this.selectedCardId = data.collection.selected_card_id;
-                            localStorage.setItem(`rrb_selected_card_${this.currentProfile}`, this.selectedCardId);
-                        } else {
-                            // If API is missing it, try to restore from local storage to keep state
-                            const localSelection = localStorage.getItem(`rrb_selected_card_${this.currentProfile}`);
-                            if (localSelection && localSelection !== 'null' && localSelection !== 'undefined') {
-                                this.selectedCardId = localSelection;
-                            }
                         }
 
-                        // If Server is equal or better, accept it and update local backup
+                        // TRUST THE SERVER OVER LOCAL
                         localStorage.setItem(this.storageKey, JSON.stringify(serverMerged));
                         this.collection = serverMerged; // CRITICAL: Update internal state
                         return serverMerged;

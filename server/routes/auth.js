@@ -99,4 +99,41 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// Import protect middleware for the sync route
+const { protect } = require('../middleware/auth');
+
+// Sync Profile (Autosave endpoint)
+router.put('/profile/sync', protect, async (req, res) => {
+    try {
+        const userId = req.user.id; // From protect middleware
+        const { collection, economy, achievements, stats, inventory, perks } = req.body;
+
+        // Find the user's profile
+        let profile = await Profile.findOne({ user_id: userId });
+
+        if (!profile) {
+            return res.status(404).json({ success: false, message: 'Profil nie istnieje.' });
+        }
+
+        // Update fields if they were provided in the request
+        if (collection) profile.collection = collection;
+        if (economy) profile.economy = economy;
+        if (achievements) profile.achievements = achievements;
+        if (stats) profile.stats = stats;
+        if (inventory) profile.inventory = inventory;
+        if (perks) profile.perks = perks;
+
+        profile.updated_at = Date.now();
+
+        // Save to Database
+        await profile.save();
+
+        res.json({ success: true, message: 'Profil zsynchronizowany pomyślnie.', updated_at: profile.updated_at });
+
+    } catch (error) {
+        console.error('Profile sync error:', error);
+        res.status(500).json({ success: false, message: 'Błąd serwera podczas synchronizacji profilu.' });
+    }
+});
+
 module.exports = router;
