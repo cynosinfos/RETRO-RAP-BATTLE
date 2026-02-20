@@ -4602,7 +4602,7 @@
                 death: { row: 3, frames: 4, startFrame: 4 },
                 block: { row: 4, frames: 4, startFrame: 0 },
                 victory: { row: 4, frames: 4, startFrame: 4 },
-                special: { row: 5, frames: 5, startFrame: 0, type: 'special_projectile' },
+                special: { row: 5, frames: 8, startFrame: 0, type: 'francis_throw' },
                 attack1_super: { row: 6, frames: 8, startFrame: 0, type: 'car_super' },
                 run: { row: 7, frames: 8, startFrame: 0 },
                 jump: { row: 0, frames: 1, startFrame: 0 },

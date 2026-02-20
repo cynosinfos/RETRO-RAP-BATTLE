@@ -121,6 +121,44 @@ class Fighter extends Sprite {
                 this.attackBox.width = 0
             }
 
+            // FRANCIS THROW SPECIAL (Row 5 - Jump from 2 to 7)
+            else if (this.currentType === 'francis_throw' && this.isAttacking) {
+                if (this.framesCurrent <= 2) {
+                    this.framesHold = 10
+                }
+                else if (this.framesCurrent >= 3 && this.framesCurrent < 7) {
+                    this.framesCurrent = 7
+                }
+                else if (this.framesCurrent === 7) {
+                    if (!this.specialSpawned) {
+                        const projectileDirection = this.flipHorizontal ? -1 : 1
+                        if (typeof Projectile !== 'undefined') {
+                            const specialProjectile = new Projectile({
+                                position: {
+                                    x: this.position.x + (this.flipHorizontal ? -50 : this.width + 50),
+                                    y: this.position.y + 40
+                                },
+                                velocity: {
+                                    x: projectileDirection * 15,
+                                    y: 0
+                                },
+                                image: this.sprites.special.image,
+                                framesMax: 1,
+                                scale: this.scale,
+                                owner: this,
+                                framesRow: 5,
+                                startFrame: 7,
+                                radius: 40
+                            })
+                            if (typeof projectiles !== 'undefined') projectiles.push(specialProjectile)
+                        }
+                        this.specialSpawned = true
+                    }
+                    this.framesHold = 20
+                }
+                this.attackBox.width = 0
+            }
+
             // TACO SUPER BLINK Logic
             else if (this.isAttacking && this.currentType === 'taco_super') {
                 this.showTacoBlink = [1, 3, 5].includes(this.framesCurrent);

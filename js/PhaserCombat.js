@@ -1070,6 +1070,53 @@ class CombatScene extends Phaser.Scene {
                 return;
             }
 
+            // FRANCIS THROW - frames 0-2 leading to frame 7 (frame 7 IS SHOWN on character)
+            if (specialType === 'francis_throw') {
+                let francisHandled = false;
+                const francisTimer = this.time.addEvent({
+                    delay: 16,
+                    repeat: 60,
+                    callback: () => {
+                        if (!s.active || francisHandled) return;
+                        const currentAnim = s.anims.currentAnim;
+                        if (!currentAnim || currentAnim.key !== specialAnimKey) return;
+
+                        const fi = s.anims.currentFrame ? (s.anims.currentFrame.index - 1) : 0;
+
+                        if (fi === 2) {
+                            francisHandled = true;
+                            francisTimer.remove();
+
+                            // Show Frame 7 and throw
+                            s.anims.pause();
+                            const frames = s.anims.currentAnim.frames;
+                            if (frames[7]) s.anims.setCurrentFrame(frames[7]);
+
+                            if (!s.getData('projectileSpawned')) {
+                                this.spawnSpecialProjectile(s, pre);
+                                s.setData('projectileSpawned', true);
+                            }
+
+                            this.time.delayedCall(300, () => {
+                                if (s.active) {
+                                    s.anims.resume();
+                                    s.setData('isAttacking', false).play(`${pre}_idle`);
+                                }
+                            });
+                        }
+                    }
+                });
+                s.once('animationcomplete', () => {
+                    francisTimer.remove();
+                    if (!s.getData('projectileSpawned')) {
+                        this.spawnSpecialProjectile(s, pre);
+                        s.setData('projectileSpawned', true);
+                    }
+                    if (s.active) s.setData('isAttacking', false).play(`${pre}_idle`);
+                });
+                return;
+            }
+
             // GENERIC SPECIAL: Spawn projectile at triggerFrame
             let triggerFrame = 3;
             if (data && data.spriteSheetData.states.special && data.spriteSheetData.states.special.triggerFrame !== undefined) {
