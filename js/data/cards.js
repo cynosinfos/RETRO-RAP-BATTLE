@@ -59,7 +59,7 @@ const JOURNALISTS_LIST = [
     { id: 'mateusz_natali', name: 'Mateusz Natali', img: 'mateusz_natali', social: { instagram: 'https://www.instagram.com/mateusznatali/', youtube: 'https://www.youtube.com/@PopkillerTV' } },
     { id: 'jacek_adamkiewicz', name: 'Jacek Adamkiewicz', img: 'jacek_adamkiewicz', social: { instagram: 'https://www.instagram.com/jacek_adamkiewicz/', youtube: 'https://www.youtube.com/@JacekAdamkiewicz' } },
     { id: 'muzyka_tv', name: 'Muzyka TV', img: 'muzyka_tv', social: { youtube: 'https://www.youtube.com/@muzykatv4554', instagram: 'https://www.instagram.com/muzykatvswag/', twitch: 'https://www.twitch.tv/muzykatv1' } },
-    { id: 'flint', name: 'Flint', img: 'flint', social: { instagram: 'https://www.instagram.com/jakubflint/', youtube: 'https://www.youtube.com/user/FlintOfficial' } },
+    { id: 'flint', name: 'Flint', img: 'flint', social: {} },
     { id: 'novacci', name: 'Novacci', img: 'novacci', social: { instagram: 'https://www.instagram.com/novaccinovacci/' } },
     { id: 'wuwunio', name: 'Wuwunio', img: 'wuwunio', social: { instagram: 'https://www.instagram.com/wuwunio/', youtube: 'https://www.youtube.com/@wuwunio' } },
     { id: 'warga', name: 'Warga', img: 'warga', social: { instagram: 'https://www.instagram.com/programzdupy/', youtube: 'https://www.youtube.com/user/zdupy' } },
