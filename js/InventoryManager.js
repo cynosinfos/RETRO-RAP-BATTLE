@@ -276,15 +276,11 @@ class InventoryManager {
         // Apply stats
         this.applyItemEffect(item);
 
-        // Remove if consumable
-        const isConsumable = item.consumable || item.type === 'consumable';
-        if (isConsumable) {
-            delete this.inventory.placedItems[slotId];
-            this.saveInventory();
-            return { success: true, message: `Skonsumowano: ${item.name}!`, consumed: true };
-        }
-
-        return { success: true, message: `Użyto: ${item.name}!`, consumed: false };
+        // ALWAYS CONSUME when 'usePlacedItem' is called (User Request: "rzeczy jak czapka czy mikrofon sie nie zuzywaja")
+        // This prevents infinite stat farming from non-consumable items that have 'Use' button enabled.
+        delete this.inventory.placedItems[slotId];
+        this.saveInventory();
+        return { success: true, message: `Użyto: ${item.name}!`, consumed: true };
     }
 
     applyItemEffect(item) {
@@ -321,17 +317,13 @@ class InventoryManager {
         // ALL ITEMS SHOULD BE USABLE (User Request V9.6)
         this.applyItemEffect(item);
 
-        const isConsumable = item.consumable === true || item.type === 'consumable';
-        if (isConsumable) {
-            const idx = this.inventory.items.indexOf(itemId);
-            if (idx > -1) {
-                this.inventory.items.splice(idx, 1);
-                this.saveInventory();
-            }
-            return { success: true, message: `Skonsumowano: ${item.name}.`, consumed: true };
+        // ALWAYS CONSUME (User Request: prevent infinite usage)
+        const idx = this.inventory.items.indexOf(itemId);
+        if (idx > -1) {
+            this.inventory.items.splice(idx, 1);
+            this.saveInventory();
         }
-
-        return { success: true, message: `Uzyto: ${item.name}.`, consumed: false };
+        return { success: true, message: `Użyto: ${item.name}.`, consumed: true };
     }
 
     sellItem(itemId) {
