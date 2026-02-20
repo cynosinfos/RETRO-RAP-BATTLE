@@ -1,7 +1,7 @@
 class AudioManager {
     constructor() {
         this.music = {
-            menu: new Audio('./audio/music_menu_v2.mp3')
+            menu: new Audio('./audio/music_fight.mp3')
         }
 
         // Random Fight Music Playlist
