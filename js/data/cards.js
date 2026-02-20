@@ -19,11 +19,11 @@ const CARD_TYPES = {
 
 // Producers & DJs List
 const PRODUCERS_LIST = [
-    { id: 'kubi', name: 'Kubi Producent', img: 'kubi_producent', social: { spotify: 'https://open.spotify.com/artist/0WDJa0qnagyOnMaiD26wht?si=QoHaua4rTKGBbN2FMTRhPw', instagram: https://www.instagram.com/kubiproducent/', youtube: 'https://www.youtube.com/@Kubi_Producent' } },
-    { id: 'steez', name: 'Steez', img: 'steez', social: { spotify: https://open.spotify.com/artist/7v49oVVUhvIQG5EK0jkcF7?si=QUHaj6T3QfiKfqDbempt7A', instagram: 'https://www.instagram.com/steez83/', youtube: 'https://www.youtube.com/@Steez83' } },
+    { id: 'kubi', name: 'Kubi Producent', img: 'kubi_producent', social: { spotify: 'https://open.spotify.com/artist/0WDJa0qnagyOnMaiD26wht?si=QoHaua4rTKGBbN2FMTRhPw', instagram: 'https://www.instagram.com/kubiproducent/', youtube: 'https://www.youtube.com/@Kubi_Producent' } },
+    { id: 'steez', name: 'Steez', img: 'steez', social: { spotify: 'https://open.spotify.com/artist/7v49oVVUhvIQG5EK0jkcF7?si=QUHaj6T3QfiKfqDbempt7A', instagram: 'https://www.instagram.com/steez83/', youtube: 'https://www.youtube.com/@Steez83' } },
     { id: 'dj_chwial', name: 'DJ Chwial', img: 'dj_chwial', social: { instagram: 'https://www.instagram.com/chwial_the_returners/', spotify: 'https://open.spotify.com/artist/4zO6WqG8mu49ek0ZDIptTk?si=qgYDZyCoSSuoxBBuPrrHZA' } },
     { id: 'jedynak', name: 'Jedynak', img: 'jedynak', social: { instagram: 'https://www.instagram.com/janporebski2020/', spotify: 'https://open.spotify.com/artist/3hf4x3XTc6O8Fr0qGZDrnu?si=J--Aw_mgRc6T-OtuzdmmCw' } },
-    { id: '600v', name: '600V', img: '600v', social: { instagram: 'https://www.instagram.com/600v_music/',1 00spotify: 'https://open.spotify.com/artist/1f5Eu4igDRi2LNNY837AdS?si=uTJHedd3Qr6vdd8DFa5m2g' } },
+    { id: '600v', name: '600V', img: '600v', social: { instagram: 'https://www.instagram.com/600v_music/', spotify: 'https://open.spotify.com/artist/1f5Eu4igDRi2LNNY837AdS?si=uTJHedd3Qr6vdd8DFa5m2g' } },
     { id: 'ajron', name: 'Ajron', img: 'ajron', social: { instagram: 'https://www.instagram.com/michaldabal/', spotify: 'https://open.spotify.com/artist/5dlqcZJpv99qibC0d9mJLM?si=t8Ct8bTARnm1gmFGMv4cFg' } },
     { id: 'dj_biskup', name: 'DJ Biskup', img: 'dj_biskup', social: { instagram: 'https://www.instagram.com/djbiskup/', kick: 'https://kick.com/djbiskup/videos' } },
     { id: 'dj_decks', name: 'DJ Decks', img: 'dj_decks', social: { instagram: 'https://www.instagram.com/djdecks/', spotify: 'https://open.spotify.com/artist/7rRsXnU1mpJwuBNMwH0Tsn?si=m73stxwNRH6UUMQ4Phbk1g' } },
@@ -31,16 +31,16 @@ const PRODUCERS_LIST = [
     { id: 'dj_ike', name: 'DJ Ike', img: 'dj_ike', social: { instagram: 'https://www.instagram.com/djikecom/', spotify: 'https://open.spotify.com/artist/7h7GI8ug0kdo9ct3vj1Mw5?si=vt5asyqXRKOhzMaKTq8FDA' } },
     { id: 'dj_moyes', name: 'DJ Moyes', img: 'dj_moyes', social: { instagram: 'https://www.instagram.com/dj_moyes/' } },
     { id: 'dj_taek', name: 'DJ Taek', img: 'dj_taek', social: { spotify: 'https://open.spotify.com/artist/5FhjSSoKazHVr8mWpiwW6R?si=Cc647pPoRzar2DO-_4uaBw', instagram: 'https://www.instagram.com/dj.taek/' } },
-    { id: 'enzu', name: 'Enzu', img: 'enzu', social: { instagram: 'https://www.instagram.com/enzumusic/'} },
+    { id: 'enzu', name: 'Enzu', img: 'enzu', social: { instagram: 'https://www.instagram.com/enzumusic/' } },
     { id: 'favst', name: 'Favst', img: 'favst', social: { spotify: 'https://open.spotify.com/artist/16TsNPlesuA1R9kPLS6nta?si=xaAYR_JKRBGDEzyEWBgLSg', instagram: 'https://www.instagram.com/favstmusik/' } },
     { id: 'forxst', name: 'Forxst', img: 'forxst', social: { instagram: 'https://www.instagram.com/forxst/', spotify: 'https://open.spotify.com/artist/4t8zhFslMZ1y2XQo6uirep?si=SGHKzhIlRUyvs2o4vwftxA' } },
     { id: 'francis', name: 'Francis', img: 'francis', social: { spotify: 'https://open.spotify.com/artist/6HdxibJzoNkDUUDHagx3Ko?si=8Tc3VI1eQUGsR5KdL0J_VQ', instagram: 'https://www.instagram.com/bonjour.francis/' } },
     { id: 'jonatan', name: 'Jonatan', img: 'jonatan', social: { spotify: 'https://open.spotify.com/artist/2dLhpezBEgAELn73fiMEak?si=3qeLWs1jRM2kUZ85g_5OgA', instagram: 'https://www.instagram.com/jonatan.music/' } },
     { id: 'lanek', name: 'Lanek', img: 'lanek', social: { instagram: 'https://www.instagram.com/LANEK1/', spotify: 'https://open.spotify.com/artist/7afPAbg5jb45KFUSnHIMFG?si=ST1VeAw_TM6-VxJIUg9TvQ' } },
-    { id: 'magiera', name: 'Magiera', img: 'magiera', social: { spotify: https://open.spotify.com/artist/3OFZwEYEAKMEmUheZ8TKso?si=yeunq1JxTlGtKMkngvB-0Q', instagram: 'https://www.instagram.com/magierski_71/' } },
+    { id: 'magiera', name: 'Magiera', img: 'magiera', social: { spotify: 'https://open.spotify.com/artist/3OFZwEYEAKMEmUheZ8TKso?si=yeunq1JxTlGtKMkngvB-0Q', instagram: 'https://www.instagram.com/magierski_71/' } },
     { id: 'noon', name: 'Noon', img: 'noon', social: { instagram: 'https://www.instagram.com/noon_pentasix/', youtube: 'https://www.youtube.com/channel/NoweNagrania' } },
     { id: 'pawbeats', name: 'Pawbeats', img: 'pawbeats', social: { instagram: 'https://www.instagram.com/pawbeats/', youtube: 'https://www.youtube.com/@Pawbeats' } },
-    { id: 'soulpete', name: 'Soulpete', img: 'soulpete', social: { spotify: 'https://open.spotify.com/artist/5ZdPxvZW2SJhHepZxAx7b5?si=KQPCaRkbTLGVUs5okdC9IA', 'https://www.instagram.com/soulpetemusic/' } },
+    { id: 'soulpete', name: 'Soulpete', img: 'soulpete', social: { spotify: 'https://open.spotify.com/artist/5ZdPxvZW2SJhHepZxAx7b5?si=KQPCaRkbTLGVUs5okdC9IA', instagram: 'https://www.instagram.com/soulpetemusic/' } },
     { id: 'waco', name: 'Waco', img: 'waco', social: { spotify: 'https://open.spotify.com/artist/4fwFJRmea6ksX4ZUM1Hhlu?si=7t7t1acJRuCr2ipb0ubJ2A', instagram: 'https://www.instagram.com/waco_odalastudio/' } },
     { id: 'matheo', name: 'Matheo', img: 'matheo', social: { instagram: 'https://www.instagram.com/officialmatheo', youtube: 'https://www.youtube.com/@MatheoProductions', spotify: 'https://open.spotify.com/artist/6YFFJXCSmDv4SJEi0JSp2S?si=UcNy2j3IRQK47pNV-GYb-A' } },
     { id: 'zeppy_zep', name: 'Zeppy Zep', img: 'zeppy_zep', social: { spotify: 'https://open.spotify.com/artist/2hnyMG1DuXarlHFJDITc3n?si=vKM3yqu-R_iTX00d-Ly14w', instagram: 'https://www.instagram.com/zeppyzep', youtube: 'https://www.youtube.com/@zeppyzep' } },
@@ -64,7 +64,7 @@ const JOURNALISTS_LIST = [
     { id: 'wuwunio', name: 'Wuwunio', img: 'wuwunio', social: { instagram: 'https://www.instagram.com/wuwunio/', youtube: 'https://www.youtube.com/@wuwunio' } },
     { id: 'warga', name: 'Warga', img: 'warga', social: { instagram: 'https://www.instagram.com/programzdupy/', youtube: 'https://www.youtube.com/user/zdupy' } },
     { id: 'skopzzor', name: 'Skopzzor', img: 'skopzzor', social: { instagram: 'https://www.instagram.com/skopzzor/', kick: 'https://kick.com/skopzzor', youtube: 'https://www.youtube.com/@SkopzzoR' } },
-    { id: 'patkustoms', name: 'Patkustoms', img: 'patkustoms', social: { youtube: 'https://www.youtube.com/c/DailyGrind', 'https://www.instagram.com/patkustoms_official/' } },
+    { id: 'patkustoms', name: 'Patkustoms', img: 'patkustoms', social: { youtube: 'https://www.youtube.com/c/DailyGrind', instagram: 'https://www.instagram.com/patkustoms_official/' } },
     { id: 'matt', name: 'Matt', img: 'matt', social: { youtube: 'https://www.youtube.com/@RapMATTers', instagram: 'https://www.instagram.com/rapmatterspodcast/', spotify: 'https://open.spotify.com/show/1zdmnSXVz7aLR137V38v9j?si=aeb1630b8270458b' } },
     { id: 'horrypaz', name: 'Horrypaz', img: 'horrypaz', social: { instagram: 'https://www.instagram.com/horrypaz/', youtube: 'https://www.youtube.com/@horrypaz', twitch: 'https://www.twitch.tv/horrypaz' } }
 ];
@@ -109,7 +109,11 @@ const RAPPERS_LIST = [
     { id: 'borixon', name: 'Borixon', img: 'borixon', social: { spotify: 'https://open.spotify.com/artist/5Q5WdRs96HgbxdVIfhHqt2?si=o0PxKaWZSLmFzQyvJdRwpQ', instagram: 'https://www.instagram.com/borixon_newbadline/', youtube: 'https://www.youtube.com/@spacerlabel' } },
     { id: 'liroy', name: 'Liroy', img: 'liroy', social: { instagram: 'https://www.instagram.com/liroy_marzec/', spotify: 'https://open.spotify.com/artist/1YNJc03EgclUK2rnLX7tE5?si=qwwiIvotQ7yiRG4B5SoI3Q' } },
     { id: 'pih', name: 'Pih', img: 'pih', social: { instagram: 'https://www.instagram.com/pihszou/', spotify: 'https://open.spotify.com/artist/4x2dSjOKPB7f2S5moqNGtV?si=eYLGXij3QZWF2TNtvVJBQQ' } },
-    { id: 'pelson', name: 'Pelson', img: 'pelson', social: { instagram: 'https://www.instagram.com/pelson_kontra/', https://open.spotify.com/artist/7KEnuKnjw3c9XH7em1lqIT?si=w1LW76bTR8qOiqls17V8mg' } },
+    {
+        id: 'pelson', name: 'Pelson', img: 'pelson', social: {
+            instagram: 'https://www.instagram.com/pelson_kontra/', spotify: 'https://open.spotify.com/artist/7KEnuKnjw3c9XH7em1lqIT?si=w1LW76bTR8qOiqls17V8mg'
+        }
+    },
     { id: 'mezo', name: 'MEZO', img: 'mezo', social: { instagram: 'https://www.instagram.com/jacek_mezo_mejer/', spotify: 'https://open.spotify.com/artist/4ZqkZhFSFECbgemBC6ILUC?si=fFOE0FErTBqItu4sQXlZ4Q' } },
     { id: 'vkie', name: 'VKI', img: 'vkie', social: { instagram: 'https://www.instagram.com/bigvkie/', youtube: 'https://www.youtube.com/@TheBiggestVkie', spotify: 'https://open.spotify.com/artist/3DPog7Ux8hRgsTWdlFDl7v?si=H8AYwZz3SjWu3uUZ5W4Kqg' } },
     { id: 'ero', name: 'Ero', img: 'ero', social: { instagram: 'https://www.instagram.com/erosick1/', youtube: 'https://www.youtube.com/@Ero_JWP', spotify: 'https://open.spotify.com/artist/5DM2lp5yxLNjwHPmFGcFqr?si=xbK6PaJXTumE_4fLJvFKvw' } },
@@ -144,7 +148,7 @@ const RAPPERS_LIST = [
     { id: 'bosski', name: 'Bosski Roman', img: 'bosski_roman', social: { instagram: 'https://www.instagram.com/bosskiroman/', youtube: 'https://www.youtube.com/user/BosskiRomanFirma', spotify: 'https://open.spotify.com/artist/040SDzfzE2xQL8HKkBja92?si=bQlKaL8jRLK6Nlxpz3X2BQ' } },
     { id: 'catchup', name: 'Catchup', img: 'catchup', social: { instagram: 'https://www.instagram.com/catchupxxl/', youtube: 'https://www.youtube.com/@TomSchklaneck', spotify: 'https://open.spotify.com/search/Catchup' } },
     { id: 'cielog', name: 'Cielog', img: 'cielog', social: { spotify: 'https://open.spotify.com/artist/2KDDRiSQUC2X5Mb9j0Y2G6?si=uSOYQUBHQMCnlgz7Pm52sw', instagram: 'https://www.instagram.com/cielog_cm3/', youtube: '' } },
-    { id: 'dawid_szynol', name: 'Dawid Szynol', img: 'dawid_szynol',} },
+    { id: 'dawid_szynol', name: 'Dawid Szynol', img: 'dawid_szynol', social: {} },
     { id: 'dizkret', name: 'Dizkret', img: 'dizkret', social: { spotify: 'https://open.spotify.com/artist/5r7hanNIrLe99HTjW5ksF5?si=RIE5zJb_QH6sHD7AVe5yMg', instagram: 'https://www.instagram.com/dizkret', youtube: '' } },
     { id: 'dziarma', name: 'Dziarma', img: 'dziarma', social: { instagram: 'https://www.instagram.com/dziarmadziarma/', youtube: 'https://www.youtube.com/@dziarmaofficial', spotify: 'https://open.spotify.com/artist/6LwJ1zgqEFyIwXzDD44Qsn?si=jlhWtyGDQAiKmUh62dEFHQ' } },
     { id: 'eripe', name: 'Eripe', img: 'eripe', social: { youtube: 'https://www.youtube.com/@patokalipsa', spotify: 'https://open.spotify.com/artist/2E2h76dKcZsiyHgrQqEeyL?si=1I0zWYF6Q86_eMrwYtXlLQ' } },
@@ -171,8 +175,7 @@ const RAPPERS_LIST = [
     { id: 'kuqe', name: 'Kuqe', img: 'kuqe_2115', social: { instagram: 'https://www.instagram.com/kuqe2115/', spotify: 'https://open.spotify.com/artist/2FtYzWBUVhZ2vfy8S207Zf?si=RjzXkKzaQRiCOKtAA8Q_Lw', youtube: 'https://www.youtube.com/@2115', } },
     { id: 'laikike1', name: 'Laikike1', img: 'laikike1', social: { spotify: 'https://open.spotify.com/artist/4EqxNZ4CPKBBJ9sG1O5YS3?si=ZckK9ZCqQT6hwMrMYPTFNQ' } },
     { id: 'lajzol', name: 'Lajzol', img: 'lajzol', social: { instagram: 'https://www.instagram.com/lajzol/', spotify: 'https://open.spotify.com/artist/1nwcBZHeNpgC6OnXGl3wEz?si=obR13_byS8SnTOVgMzPNTA' } },
-    { id: 'lech', name: 'Lech Roch Pawlak', img: 'lech_roch_pawlak' '' } },
-    { id: 'little', name: 'Little', img: 'little', social: { spotify: https://open.spotify.com/artist/4zO6WqG8mu49ek0ZDIptTk?si=qgYDZyCoSSuoxBBuPrrHZA', instagram: 'https://www.instagram.com/returnersi/', youtube: '' } },
+    { id: 'lech', name: 'Lech Roch Pawlak', img: 'lech_roch_pawlak', social: { spotify: 'https://open.spotify.com/search/Lech%20Roch%20Pawlak', instagram: '', youtube: '' } },
     { id: 'livka', name: 'Livka', img: 'livka', social: { instagram: 'https://www.instagram.com/jestemlivka/', spotify: 'https://open.spotify.com/artist/0eWYWLizN5us1MOF1rdyh9?si=I3GfBFMMT0yN6Nzwmg6mqQ' } },
     { id: 'lj_karwel', name: 'LJ Karwel', img: 'lj_karwel', social: { instagram: 'https://www.instagram.com/lj_karwel/', spotify: 'https://open.spotify.com/artist/6RQXRtqg3ybLOOOZ7so1FY?si=q4uaq8l-SreX9UvuDzuuDA' } },
     { id: 'lona', name: 'Lona', img: 'lona', social: { spotify: 'https://open.spotify.com/artist/6YpCzWpIXRTdLlpPgDcMJZ?si=DINYcEVERyuaWHubgO2MLg', instagram: 'https://www.instagram.com/lona_szn/', youtube: '' } },
@@ -186,7 +189,11 @@ const RAPPERS_LIST = [
     { id: 'pers', name: 'Pers', img: 'pers', social: { instagram: 'https://www.instagram.com/codziennieinnymarcel/', spotify: 'https://open.spotify.com/artist/6C3KMofGcxnVUqmg8jPgp4?si=cThvi-voSFCE8h9TAghcyA' } },
     { id: 'planet_anm', name: 'Planet ANM', img: 'planet_anm', social: { spotify: 'https://open.spotify.com/artist/3uGlyGgYrMUAvqTSR8132Q?si=1eUK0-2pRvibyy3XdnKaPw', instagram: 'https://www.instagram.com/planetanm/', youtube: '' } },
     { id: 'pyskaty', name: 'Pyskaty', img: 'pyskaty', social: { spotify: 'https://open.spotify.com/artist/1uHMNXVaAUGxl23xsBWzTA?si=AL42LOfNS_SFpB5-kdToeQ', instagram: 'https://www.instagram.com/pyskwpysk/', youtube: '' } },
-    { id: 'ras', name: 'RAS', img: 'ras', social: { spotify: https://open.spotify.com/artist/5qgCrzMzASs1YpEMSp7tGt?si=AA6VG9_URjqY-QQxNvZ38A', instagram: 'https://www.instagram.com/ras_rsmt/', } },
+    {
+        id: 'ras', name: 'RAS', img: 'ras', social: {
+            spotify: 'https://open.spotify.com/artist/5qgCrzMzASs1YpEMSp7tGt?si=AA6VG9_URjqY-QQxNvZ38A', instagram: 'https://www.instagram.com/ras_rsmt/'
+        }
+    },
     { id: 'schafter', name: 'Schafter', img: 'schafter', social: { instagram: 'https://www.instagram.com/restaurant_posse/', spotify: 'https://open.spotify.com/artist/2aDaFARm4U9hf5DI9Fhbnh?si=1ux84gBOSM-f8lYhXf0Dog' } },
     { id: 'shhieda', name: 'Shhieda', img: 'shhieda', social: { instagram: 'https://www.instagram.com/shhiedae/', spotify: 'https://open.spotify.com/artist/3SmlmvX2qQzGJDn2QZkMFW?si=O3AdGBMRTR2b9lVq2kWjCA' } },
     { id: 'sitek', name: 'Sitek', img: 'sitek', social: { instagram: 'https://www.instagram.com/sitekofficial_/', spotify: 'https://open.spotify.com/album/01JxaHYHAEJ67rSdJVlkj4?si=WNPs34w2QSqlmL30dmsExQ' } },
