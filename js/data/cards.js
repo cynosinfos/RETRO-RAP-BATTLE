@@ -64,7 +64,7 @@ const JOURNALISTS_LIST = [
     { id: 'wuwunio', name: 'Wuwunio', img: 'wuwunio', social: { instagram: 'https://www.instagram.com/wuwunio/', youtube: 'https://www.youtube.com/@wuwunio' } },
     { id: 'warga', name: 'Warga', img: 'warga', social: { instagram: 'https://www.instagram.com/programzdupy/', youtube: 'https://www.youtube.com/user/zdupy' } },
     { id: 'skopzzor', name: 'Skopzzor', img: 'skopzzor', social: { instagram: 'https://www.instagram.com/skopzzor/', kick: 'https://kick.com/skopzzor', youtube: 'https://www.youtube.com/@SkopzzoR' } },
-    { id: 'patkustoms', name: 'Patkustoms', img: 'patkustoms', social: { youtube: 'https://www.youtube.com/c/DailyGrind', instagram: 'https://www.instagram.com/patkustoms_official/' } },
+    { id: 'patkustoms', name: 'Pat Kustoms', img: 'patkustoms', social: { youtube: 'https://www.youtube.com/@dailygrind2020', instagram: 'https://www.instagram.com/patkustoms_official/' } },
     { id: 'matt', name: 'Matt', img: 'matt', social: { youtube: 'https://www.youtube.com/@RapMATTers', instagram: 'https://www.instagram.com/rapmatterspodcast/', spotify: 'https://open.spotify.com/show/1zdmnSXVz7aLR137V38v9j?si=aeb1630b8270458b' } },
     { id: 'horrypaz', name: 'Horrypaz', img: 'horrypaz', social: { instagram: 'https://www.instagram.com/horrypaz/', youtube: 'https://www.youtube.com/@horrypaz', twitch: 'https://www.twitch.tv/horrypaz' } }
 ];
