@@ -1214,8 +1214,8 @@ function startGame() {
     if (gameStarted) return;
     if (!player1Selection || (!player2Selection && (gameMode === 'PVP' || gameMode === 'ONLINE'))) return // Safety check
 
-    // Stamina Check for Fights (except Training)
-    if (gameMode !== 'TRAINING' && window.statsManager) {
+    // Stamina Check for Fights (except Training and Online)
+    if (gameMode !== 'TRAINING' && gameMode !== 'ONLINE' && window.statsManager) {
         // Online guests might rely on host? But usually local check is fine for visual feedback
         // If we are Guest, maybe skip check? Or check anyway.
         // Let's check for everyone for now.
@@ -1266,6 +1266,10 @@ function startGame() {
     // const randomBackground = backgrounds[Math.floor(Math.random() * backgrounds.length)]
 
     // Use Selected Map
+    if (!maps[mapIndex]) {
+        console.warn("[GameCore] mapIndex out of bounds:", mapIndex, "Resetting to 0");
+        mapIndex = 0;
+    }
     const selectedMapObj = maps[mapIndex]
     const selectedBackground = selectedMapObj.image
 
@@ -3555,7 +3559,7 @@ window.handleOnlineInput = function (data) {
         // Force Start Procedure
         mapSelectionActive = false
         if (typeof mapSelectionScreen !== 'undefined' && mapSelectionScreen) mapSelectionScreen.style.display = 'none'
-        if (typeof gameScreen !== 'undefined' && gameScreen) gameScreen.style.display = 'inline-block'
+        // gameScreen.style.display = 'inline-block' // MOVED TO startGame() timer to sync with VS Screen
 
         if (typeof startGame === 'function') startGame()
         return

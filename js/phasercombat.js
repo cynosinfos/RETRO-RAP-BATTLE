@@ -38,7 +38,14 @@ class CombatScene extends Phaser.Scene {
         // BYPASS CORS: We use Image objects instead of this.load.image
         // because file:// protocol blocks XHR/fetch.
         console.log("%cPhaser Preload (Safe Mode)", "color: cyan");
-        if (!this.p1Key || !this.p2Key) return;
+
+        if (!this.p1Key || !this.p2Key) {
+            console.warn("[PhaserCombat] Missing character keys (P1/P2). Scene might be empty.", { p1: this.p1Key, p2: this.p2Key });
+            // Don't return early without setting state, otherwise create() hangs
+            this.isReady = true;
+            this.events.emit('assets_done');
+            return;
+        }
 
         const p1Data = this.findCharData(this.p1Key);
         const p2Data = this.findCharData(this.p2Key);
@@ -53,12 +60,21 @@ class CombatScene extends Phaser.Scene {
 
         if (this.mapData && this.mapData.image && !this.mapData.image.toLowerCase().endsWith('.gif')) {
             assets.push({ key: 'map_bg', url: this.mapData.image, isSheet: false });
+        } else {
+            console.log("[PhaserCombat] Map is GIF or missing, skipping texture load (DOM will handle it)");
         }
 
         // Always load projectile/super assets
         assets.push({ key: 'police_car', url: './img/police_car.png', isSheet: false });
 
         this.targetCount = assets.length;
+        console.log(`[PhaserCombat] Loading ${this.targetCount} assets...`);
+
+        if (this.targetCount === 0) {
+            this.isReady = true;
+            this.events.emit('assets_done');
+            return;
+        }
 
         assets.forEach(asset => {
             const img = new Image();
@@ -71,6 +87,7 @@ class CombatScene extends Phaser.Scene {
                 }
                 this.loadedCount++;
                 if (this.loadedCount >= this.targetCount) {
+                    console.log("[PhaserCombat] All assets loaded successfully.");
                     this.isReady = true;
                     this.events.emit('assets_done');
                 }
@@ -78,6 +95,10 @@ class CombatScene extends Phaser.Scene {
             img.onerror = () => {
                 console.error("Failed to load asset (CORS-Safe):", asset.url);
                 this.loadedCount++; // Still count to avoid stalling
+                if (this.loadedCount >= this.targetCount) {
+                    this.isReady = true;
+                    this.events.emit('assets_done');
+                }
             };
             img.src = asset.url;
         });
