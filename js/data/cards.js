@@ -20,7 +20,7 @@ const CARD_TYPES = {
 // Producers & DJs List
 const PRODUCERS_LIST = [
     { id: 'kubi', name: 'Kubi Producent', img: 'kubi_producent', social: { spotify: 'https://open.spotify.com/artist/0WDJa0qnagyOnMaiD26wht?si=QoHaua4rTKGBbN2FMTRhPw', instagram: 'https://www.instagram.com/kubiproducent/', youtube: 'https://www.youtube.com/@Kubi_Producent' } },
-    { id: 'steez', name: 'Steez', img: 'steez', social: { spotify: 'https://open.spotify.com/artist/7v49oVVUhvIQG5EK0jkcF7?si=QUHaj6T3QfiKfqDbempt7A', instagram: 'https://www.instagram.com/steez83/', youtube: 'https://www.youtube.com/@Steez83' } },
+    { id: 'steez', name: 'Steez', img: 'steez', social: { spotify: 'https://open.spotify.com/artist/7v49oVVUhvIQG5EK0jkcF7?si=QUHaj6T3QfiKfqDbempt7A', instagram: 'https://www.instagram.com/steez83/', youtube: 'https://www.youtube.com/channel/UCIKpSENz2Fgfb62ZzE22xLg' } },
     { id: 'dj_chwial', name: 'DJ Chwial', img: 'dj_chwial', social: { instagram: 'https://www.instagram.com/chwial_the_returners/', spotify: 'https://open.spotify.com/artist/4zO6WqG8mu49ek0ZDIptTk?si=qgYDZyCoSSuoxBBuPrrHZA' } },
     { id: 'jedynak', name: 'Jedynak', img: 'jedynak', social: { instagram: 'https://www.instagram.com/janporebski2020/', spotify: 'https://open.spotify.com/artist/3hf4x3XTc6O8Fr0qGZDrnu?si=J--Aw_mgRc6T-OtuzdmmCw' } },
     { id: '600v', name: '600V', img: '600v', social: { instagram: 'https://www.instagram.com/600v_music/', spotify: 'https://open.spotify.com/artist/1f5Eu4igDRi2LNNY837AdS?si=uTJHedd3Qr6vdd8DFa5m2g' } },
