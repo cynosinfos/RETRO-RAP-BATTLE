@@ -95,8 +95,8 @@
 </head>
 
 <body>
-    <a href="index.html?view=playerMenu" class="back-btn"
-        onclick="event.preventDefault(); window.location.href='index.html?view=playerMenu';">
+    <a href="#" class="back-btn"
+        onclick="event.preventDefault(); if (window.parent && window.parent.closeSubpage) { window.parent.closeSubpage(); } else { window.location.href='index.html?view=playerMenu'; }">
         🛑 WRÓĆ DO MENU
     </a>
 

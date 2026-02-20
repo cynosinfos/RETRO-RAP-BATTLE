@@ -170,43 +170,53 @@
         const cardGen = new CardGenerator();
 
         async function init() {
-            // 1. Get profile from URL or localStorage
+            // 1. Get profile from URL or parent
             const urlParams = new URLSearchParams(window.location.search);
-            const profile = urlParams.get('profile') || localStorage.getItem('rrb_current_profile') || 'default';
-
-            // 2. Initialize Managers with correct profile
-            if (collectionManager.currentProfile !== profile) {
-                await collectionManager.switchProfile(profile);
-            } else {
-                await collectionManager.init();
+            let profile = urlParams.get('profile');
+            if (!profile && window.parent && window.parent.getActiveProfile) {
+                profile = window.parent.getActiveProfile();
             }
-
-            await achievementManager.init();
-            statsManager.refreshProfile();
+            if (!profile) profile = localStorage.getItem('rrb_current_profile') || 'default';
 
             document.getElementById('profileName').innerText = profile.toUpperCase();
 
-            const money = collectionManager.getMoney();
-            const cStats = collectionManager.getStats();
-            const totalCards = cStats.uniqueCards; // Using unique cards as "Cards in Collection" usually means unique types
+            // 2. Fetch managers from Parent (RAM) or Local context (Fallback)
+            const cm = (window.parent && window.parent.collectionManager && window.parent.collectionManager.isInitialized) ? window.parent.collectionManager : collectionManager;
+            const am = (window.parent && window.parent.achievementManager && window.parent.achievementManager.isInitialized) ? window.parent.achievementManager : achievementManager;
+            const sm = (window.parent && window.parent.statsManager) ? window.parent.statsManager : statsManager;
 
-            // Achievements
-            const aStats = achievementManager.getStats();
-            const unlockedCount = aStats.unlocked;
-            const totalAchievs = aStats.total;
+            // 3. Fallback Init if standalone
+            if (cm === collectionManager) {
+                if (cm.currentProfile !== profile) await cm.switchProfile(profile);
+                else await cm.init();
+            }
+            if (am === achievementManager) await am.init();
+            if (sm === statsManager) sm.refreshProfile();
 
-            // RPG Stats
-            const rpgStats = statsManager.stats.rpg || {};
+            // 4. Gather Data
+            const money = cm.getMoney();
+            const cStats = cm.getStats();
+            const totalCards = cStats.uniqueCards || 0;
+
+            const aStats = am.getStats();
+            const unlockedCount = aStats.unlocked || 0;
+            const totalAchievs = aStats.total || 0;
+
+            const rpgStats = sm.stats.rpg || {};
             const respect = rpgStats.respect || 0;
 
-            // Battle Stats
-            const battleStats = statsManager.stats.battle || {};
+            const battleStats = sm.stats.battle || {};
             const wins = battleStats.wins || 0;
             const losses = battleStats.losses || 0;
 
-            // Render
+            // 5. Render
             document.getElementById('statMoney').innerText = money + " MK";
-            document.getElementById('statCards').innerText = `${totalCards}/${window.CARDS_DATABASE ? CARDS_DATABASE.length : 0}`;
+
+            // Allow checking global database length safely
+            const dbLength = (typeof CARDS_DATABASE !== 'undefined') ? CARDS_DATABASE.length :
+                (window.parent && typeof window.parent.CARDS_DATABASE !== 'undefined') ? window.parent.CARDS_DATABASE.length : 0;
+
+            document.getElementById('statCards').innerText = `${totalCards}/${dbLength}`;
             document.getElementById('statWins').innerText = wins;
             document.getElementById('statLosses').innerText = losses;
             document.getElementById('statRespect').innerText = respect;

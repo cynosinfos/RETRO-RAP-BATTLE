@@ -515,16 +515,25 @@ class AchievementManager {
      */
     getStats() {
         const total = this.achievements.length;
-        const unlocked = this.progress.unlocked.length;
-        const claimed = this.progress.rewards_claimed.length;
+        const validUnlocked = this.progress.unlocked.filter(id => this.achievements.some(a => a.id === id));
+        let claimedCount = 0;
+
+        validUnlocked.forEach(id => {
+            if (this.progress.rewards_claimed.includes(id)) {
+                claimedCount++;
+            }
+        });
+
+        const unlocked = validUnlocked.length;
+        const claimed = claimedCount;
 
         return {
             total,
             unlocked,
-            locked: total - unlocked,
+            locked: Math.max(0, total - unlocked),
             claimed,
-            unclaimed: unlocked - claimed,
-            completion: Math.floor((unlocked / total) * 100),
+            unclaimed: Math.max(0, unlocked - claimed),
+            completion: total > 0 ? Math.floor((unlocked / total) * 100) : 0,
             points: this.getTotalPoints()
         };
     }
