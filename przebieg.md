@@ -56,6 +56,7 @@ Zweryfikowano i poprawiono linki do profili Spotify dla 24 artystów w `js/data/
 *   **SPA Navigation**: Rozwiązano problem z powrotem do ekranu logowania przy zamykaniu podstron (Kolekcja, Osiągnięcia) poprzez poprawne użycie `window.parent.closeSubpage()`.
 *   **Sterowanie Mobilne**: Naprawiono błąd w `js/game_core.js`, gdzie przycisk KICK (C) wykonywał rzut (Special) dla drugiego gracza (role=1).
 *   **Crash 2vs2 Chaos**: Wyeliminowano `ReferenceError` w `js/game_core.js` poprzez poprawienie kolejności deklaracji zmiennych podglądu postaci.
+*   **Ukrywanie UI podczas walki**: Zaimplementowano automatyczne ukrywanie przycisków logowania, rejestracji oraz profilu podczas walki, co poprawia komfort gry na urządzeniach mobilnych.
 
 ---
 

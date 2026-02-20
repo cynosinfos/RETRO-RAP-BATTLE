@@ -1198,6 +1198,13 @@ function startGame() {
     if (gameStarted) return;
     if (!player1Selection || (!player2Selection && (gameMode === 'PVP' || gameMode === 'ONLINE'))) return // Safety check
 
+    // Hide UI during combat
+    const uiToHide = ['topRightUI', 'profileDisplay'];
+    uiToHide.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('combat-hidden');
+    });
+
     // Stamina Check for Fights (except Training)
     if (gameMode !== 'TRAINING' && window.statsManager) {
         // Online guests might rely on host? But usually local check is fine for visual feedback
@@ -3035,6 +3042,13 @@ window.showMainMenu = function () {
 
     // Show Main Menu
     if (typeof mainMenuScreen !== 'undefined') mainMenuScreen.style.display = 'flex'
+
+    // Restore UI visible after combat
+    const uiToRestore = ['topRightUI', 'profileDisplay'];
+    uiToRestore.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('combat-hidden');
+    });
 
     // Ticker Logic
     if (typeof newsTickerBar !== 'undefined' && newsTickerBar) newsTickerBar.style.display = 'flex'
