@@ -3,7 +3,12 @@
  */
 class CollectionManager {
     constructor() {
-        const stored = localStorage.getItem('rrb_current_profile');
+        let stored = 'default';
+        try {
+            stored = localStorage.getItem('rrb_current_profile');
+        } catch (e) {
+            console.warn("[CollectionManager] LocalStorage access blocked", e);
+        }
         this.currentProfile = stored || 'default';
         this.updateStorageKey();
 
@@ -28,7 +33,13 @@ class CollectionManager {
 
         console.log(`[CollectionManager] Initializing for ${this.currentProfile}...`);
         this.collection = await this.loadCollection();
-        this.selectedCardId = localStorage.getItem(`rrb_selected_card_${this.currentProfile}`) || null;
+        let selectedId = null;
+        try {
+            selectedId = localStorage.getItem(`rrb_selected_card_${this.currentProfile}`);
+        } catch (e) {
+            console.warn("[CollectionManager] LocalStorage access blocked (selectedCard)", e);
+        }
+        this.selectedCardId = selectedId || null;
         this.isInitialized = true;
 
         return this.collection;
@@ -51,7 +62,11 @@ class CollectionManager {
     async switchProfile(profileName) {
         this.currentProfile = profileName;
         this.updateStorageKey();
-        localStorage.setItem('rrb_current_profile', profileName);
+        try {
+            localStorage.setItem('rrb_current_profile', profileName);
+        } catch (e) {
+            console.warn("[CollectionManager] LocalStorage set failed (currentProfile)", e);
+        }
 
         // 1. Reload necessary systems FIRST (to set correct profile/keys)
         if (window.achievementManager) window.achievementManager.reloadForProfile(profileName);
@@ -75,8 +90,13 @@ class CollectionManager {
      * @returns {Array} List of profile names
      */
     getProfiles() {
-        const list = localStorage.getItem('rrb_profiles_list');
-        return list ? JSON.parse(list) : ['default'];
+        try {
+            const list = localStorage.getItem('rrb_profiles_list');
+            return list ? JSON.parse(list) : ['default'];
+        } catch (e) {
+            console.warn("[CollectionManager] LocalStorage getProfiles failed", e);
+            return ['default'];
+        }
     }
 
     /**
@@ -166,7 +186,11 @@ class CollectionManager {
                         }
 
                         // TRUST THE SERVER OVER LOCAL
-                        localStorage.setItem(this.storageKey, JSON.stringify(serverMerged));
+                        try {
+                            localStorage.setItem(this.storageKey, JSON.stringify(serverMerged));
+                        } catch (e) {
+                            console.warn("[CollectionManager] LocalStorage sync unsuccessful", e);
+                        }
                         this.collection = serverMerged; // CRITICAL: Update internal state
                         return serverMerged;
                     }
@@ -177,7 +201,12 @@ class CollectionManager {
         }
 
         // 2. Fallback to LocalStorage
-        const stored = localStorage.getItem(this.storageKey);
+        let stored = null;
+        try {
+            stored = localStorage.getItem(this.storageKey);
+        } catch (e) {
+            console.warn("[CollectionManager] LocalStorage fallback failed", e);
+        }
         console.log(`[CollectionManager] Loading from key: '${this.storageKey}'`);
 
         if (stored) {
@@ -237,7 +266,11 @@ class CollectionManager {
         }
 
         // 1. Save to LocalStorage (Immediate backup)
-        localStorage.setItem(this.storageKey, JSON.stringify(this.collection));
+        try {
+            localStorage.setItem(this.storageKey, JSON.stringify(this.collection));
+        } catch (e) {
+            console.warn("[CollectionManager] LocalStorage primary save failed", e);
+        }
 
         // 2. Save to API if logged in
         if (window.authManager && window.authManager.isLoggedIn()) {
@@ -278,17 +311,29 @@ class CollectionManager {
                 // WAIT: The server endpoint replaces the whole object?
                 // Profile.js: collection.cards is replaced.
 
-                const achievementsData = (window.achievementManager ? window.achievementManager.getExportData() : null) ||
-                    (document.querySelector('iframe') && document.querySelector('iframe').contentWindow.achievementManager ? document.querySelector('iframe').contentWindow.achievementManager.getExportData() : {});
+                // SECURE IFRAME ACCESS FOR SAFARI
+                const getIframeManagerData = (managerName) => {
+                    try {
+                        const iframe = document.querySelector('iframe');
+                        if (iframe && iframe.contentWindow) {
+                            const manager = iframe.contentWindow[managerName];
+                            if (manager && typeof manager.getExportData === 'function') {
+                                return manager.getExportData();
+                            } else if (manager && managerName === 'perkManager' && manager.perks) {
+                                return manager.perks;
+                            }
+                        }
+                    } catch (e) {
+                        // This handles SecurityError on Safari when iframe is not same-origin or restricted
+                        console.warn(`[Sync] Could not access ${managerName} in iframe:`, e.message);
+                    }
+                    return {};
+                };
 
-                const statsData = (window.statsManager ? window.statsManager.getExportData() : null) ||
-                    (document.querySelector('iframe') && document.querySelector('iframe').contentWindow.statsManager ? document.querySelector('iframe').contentWindow.statsManager.getExportData() : {});
-
-                const inventoryData = (window.inventoryManager ? window.inventoryManager.getExportData() : null) ||
-                    (document.querySelector('iframe') && document.querySelector('iframe').contentWindow.inventoryManager ? document.querySelector('iframe').contentWindow.inventoryManager.getExportData() : {});
-
-                const perksData = (window.perkManager ? window.perkManager.perks : null) ||
-                    (document.querySelector('iframe') && document.querySelector('iframe').contentWindow.perkManager ? document.querySelector('iframe').contentWindow.perkManager.perks : {});
+                const achievementsData = (window.achievementManager ? window.achievementManager.getExportData() : null) || getIframeManagerData('achievementManager');
+                const statsData = (window.statsManager ? window.statsManager.getExportData() : null) || getIframeManagerData('statsManager');
+                const inventoryData = (window.inventoryManager ? window.inventoryManager.getExportData() : null) || getIframeManagerData('inventoryManager');
+                const perksData = (window.perkManager ? window.perkManager.perks : null) || getIframeManagerData('perkManager');
 
                 const res = await fetch(`${window.authManager.apiBase}/profile/save`, {
                     method: 'POST',
@@ -441,7 +486,7 @@ class CollectionManager {
     getStats() {
         const stats = {
             totalCards: this.collection.totalCards || 0,
-            uniqueCards: Object.keys(this.collection.cards).length,
+            uniqueCards: Object.keys(this.collection.cards || {}).length,
             totalAvailable: (typeof CARDS_DATABASE !== 'undefined') ? CARDS_DATABASE.length : 0,
             completion: 0,
             byTier: {},
@@ -465,6 +510,18 @@ class CollectionManager {
         });
 
         return stats;
+    }
+
+    /**
+     * Get data for synchronization
+     * @returns {Object}
+     */
+    getCollectionData() {
+        return {
+            cards: this.collection.cards || {},
+            selected_card_id: this.selectedCardId || null,
+            money: this.getMoney()
+        };
     }
 
     /**

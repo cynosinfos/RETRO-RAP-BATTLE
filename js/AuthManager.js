@@ -17,10 +17,20 @@ class AuthManager {
 
         console.log(`[AuthManager] Initialized. API Base: ${this.apiBase}`);
 
-        this.token = localStorage.getItem('jwt_token');
+        try {
+            this.token = localStorage.getItem('jwt_token');
+        } catch (e) {
+            console.warn("[AuthManager] LocalStorage blocked (token)", e);
+            this.token = null;
+        }
 
         // Restore currentUser from localStorage if exists
-        const savedUser = localStorage.getItem('user_info');
+        let savedUser = null;
+        try {
+            savedUser = localStorage.getItem('user_info');
+        } catch (e) {
+            console.warn("[AuthManager] LocalStorage blocked (user_info)", e);
+        }
         if (savedUser) {
             try {
                 this.currentUser = JSON.parse(savedUser);
@@ -56,9 +66,14 @@ class AuthManager {
 
             if (data.success) {
                 this.token = data.token;
-                localStorage.setItem('jwt_token', data.token);
+                try {
+                    localStorage.setItem('jwt_token', data.token);
+                } catch (e) { console.warn("[AuthManager] LS set failed (token)", e); }
+
                 this.currentUser = data.user;
-                localStorage.setItem('user_info', JSON.stringify(data.user));
+                try {
+                    localStorage.setItem('user_info', JSON.stringify(data.user));
+                } catch (e) { console.warn("[AuthManager] LS set failed (user)", e); }
 
                 // Initialize SaveManager
                 window.saveManager = new SaveManager();
@@ -85,9 +100,14 @@ class AuthManager {
 
             if (data.success) {
                 this.token = data.token;
-                localStorage.setItem('jwt_token', data.token);
+                try {
+                    localStorage.setItem('jwt_token', data.token);
+                } catch (e) { console.warn("[AuthManager] LS set failed (token)", e); }
+
                 this.currentUser = data.user;
-                localStorage.setItem('user_info', JSON.stringify(data.user)); // Persist user info
+                try {
+                    localStorage.setItem('user_info', JSON.stringify(data.user)); // Persist user info
+                } catch (e) { console.warn("[AuthManager] LS set failed (user)", e); }
 
                 // Initialize SaveManager
                 window.saveManager = new SaveManager();
@@ -127,9 +147,13 @@ class AuthManager {
 
         this.token = null;
         this.currentUser = null;
-        localStorage.removeItem('jwt_token');
-        localStorage.removeItem('user_info');
-        localStorage.removeItem('rrb_current_profile');
+        try {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user_info');
+            localStorage.removeItem('rrb_current_profile');
+        } catch (e) {
+            console.warn("[AuthManager] LS remove failed", e);
+        }
 
         // Redirect to base index.html to clear query params (like ?view=playerMenu)
         // that cause auto-entry logic to fire.

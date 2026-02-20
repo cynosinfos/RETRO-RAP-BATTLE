@@ -205,7 +205,11 @@ window.StatsManager = class {
     }
 
     saveStats() {
-        localStorage.setItem(this.storageKey, JSON.stringify(this.stats))
+        try {
+            localStorage.setItem(this.storageKey, JSON.stringify(this.stats));
+        } catch (e) {
+            console.warn("[StatsManager] LocalStorage save failed", e);
+        }
 
         // Trigger global save via CollectionManager (throttled)
         if (window.collectionManager && window.authManager && window.authManager.isLoggedIn()) {

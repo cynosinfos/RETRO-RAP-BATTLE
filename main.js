@@ -3166,9 +3166,12 @@ function handleMainMenuSelection() {
     } else if (mainMenuIndex === 7) {
         // FULLSCREEN
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.log(`Fullscreen error: ${err.message}`);
-            });
+            const fs = document.documentElement.requestFullscreen();
+            if (fs && fs.catch) {
+                fs.catch(err => {
+                    console.log(`Fullscreen error: ${err.message}`);
+                });
+            }
         } else {
             document.exitFullscreen();
         }

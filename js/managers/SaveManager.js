@@ -38,21 +38,21 @@ class SaveManager {
         this.isSaving = true;
 
         try {
-            // Gather all data from managers
+            // Gather all data from managers with fallbacks
             const payload = {
-                collection: window.collectionManager ? window.collectionManager.getCollectionData() : { cards: [], selected_card_id: null },
+                collection: window.collectionManager ? window.collectionManager.getCollectionData() : { cards: {}, selected_card_id: null, money: 0 },
                 economy: window.inventoryManager ? { money: window.inventoryManager.mk } : { money: 0 },
                 achievements: window.achievementManager ? {
-                    stats: window.achievementManager.stats,
-                    unlocked: Array.from(window.achievementManager.unlocked),
-                    rewards_claimed: Array.from(window.achievementManager.rewardsClaimed)
+                    stats: window.achievementManager.stats || {},
+                    unlocked: window.achievementManager.unlocked ? Array.from(window.achievementManager.unlocked) : [],
+                    rewards_claimed: window.achievementManager.rewardsClaimed ? Array.from(window.achievementManager.rewardsClaimed) : []
                 } : null,
-                inventory: window.inventoryManager ? window.inventoryManager.getInventory() : {},
+                inventory: window.inventoryManager ? (window.inventoryManager.getInventory ? window.inventoryManager.getInventory() : {}) : {},
                 perks: window.perkManager ? {
-                    learned: window.perkManager.learnedPerks,
-                    totalSpentSP: window.perkManager.totalSpentSP
+                    learned: window.perkManager.learnedPerks || [],
+                    totalSpentSP: window.perkManager.totalSpentSP || 0
                 } : { learned: [], totalSpentSP: 0 },
-                stats: window.statsManager ? window.statsManager.stats : {}
+                stats: window.statsManager ? (window.statsManager.stats || {}) : {}
             };
 
             const response = await fetch(`${window.authManager.apiBase}/auth/profile/sync`, {
