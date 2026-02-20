@@ -382,6 +382,26 @@ function updateMenuVisuals() {
 
     const isOnline = (gameMode === 'ONLINE' || gameMode === '2V2_CHAOS') && window.networkManager && window.networkManager.isOnline
 
+    // Previews (Show current actively selecting entity)
+    let p1PreviewIdx = p1Index
+    if (p1Confirmed && gameMode === '2V2_CHAOS') {
+        p1PreviewIdx = p3Index
+    }
+
+    let p2PreviewIdx = p2Index
+    if (p2Confirmed && gameMode === '2V2_CHAOS') {
+        p2PreviewIdx = p4Index
+    }
+
+    // Secondary override for 2V2_CHAOS selection slot logic
+    if (gameMode === '2V2_CHAOS') {
+        if (p1Confirmed && p2Confirmed && !p3Confirmed) {
+            p1PreviewIdx = p3Index
+        } else if (p1Confirmed && p2Confirmed && p3Confirmed && !p4Confirmed) {
+            p2PreviewIdx = p4Index
+        }
+    }
+
     // 1. Update Buttons (Highlighting)
     characterButtons.forEach((btnObj, i) => {
         const el = btnObj.element
@@ -430,30 +450,16 @@ function updateMenuVisuals() {
             if (p4Confirmed) el.style.backgroundColor = 'rgba(217, 70, 239, 0.3)'
         }
 
-        if (gameMode === '2V2_CHAOS') {
-            // Update Preview logic to show current selector
-            if (p1Confirmed && p2Confirmed && !p3Confirmed) {
-                // P3 is selecting - maybe show in P1 preview slot?
-                p1PreviewIdx = p3Index
-            } else if (p1Confirmed && p2Confirmed && p3Confirmed && !p4Confirmed) {
-                // P4 is selecting - show in P2 preview slot?
-                p2PreviewIdx = p4Index
-            }
+        // Preview Overlay logic (P1/P2 labels)
+        if (charIndex === p1PreviewIdx) {
+            label = `<div class="preview-label p1-label">P1</div>` + label
+        }
+        if (charIndex === p2PreviewIdx) {
+            label = `<div class="preview-label p2-label">P2</div>` + label
         }
 
         el.innerHTML = label
     })
-
-    // Previews (Show current actively selecting entity)
-    let p1PreviewIdx = p1Index
-    if (p1Confirmed && gameMode === '2V2_CHAOS') {
-        p1PreviewIdx = p3Index
-    }
-
-    let p2PreviewIdx = p2Index
-    if (p2Confirmed && gameMode === '2V2_CHAOS') {
-        p2PreviewIdx = p4Index
-    }
 
     // Override if they are already confirmed to show the ACTUAL selection
     if (p1Confirmed && p2Confirmed && p3Confirmed) p1PreviewIdx = p1Index; // Wait, this is getting complex.
@@ -2660,7 +2666,7 @@ function triggerKey(key, type) {
         if (finalKey === 'a') finalKey = 'arrowleft';
         if (finalKey === 'd') finalKey = 'arrowright';
         if (finalKey === ' ') finalKey = 'enter';
-        if (finalKey === 'c') finalKey = 'o';
+        // Removed incorrect 'c' -> 'o' mapping which caused Kick (C) to perform Throw/Special (O)
         if (finalKey === 'v') finalKey = 'p';
     }
 

@@ -48,11 +48,14 @@ Zweryfikowano i poprawiono linki do profili Spotify dla 24 artystów w `js/data/
     *   **Pat Kustoms**: Poprawiono nazwę (dodano spację) oraz zaktualizowano link do kanału YouTube na `@dailygrind2020`.
     *   **Steez**: Zaktualizowano link do kanału YouTube.
     *   **Lanek**: Zaktualizowano link do Instagrama (`lanek_1`).
+    *   **Flint**: Usunięto linki społecznościowe (Instagram, YouTube).
     *   **Poprawa generowania linków**: Naprawiono błąd w `cards.js`, przez który linki do social mediów Producentów i Dziennikarzy nie były poprawnie pobierane z ich obiektów konfiguracyjnych.
 
 ### 3. Poprawki Błędów i Stabilizacja
 *   **Achievement Counter**: Naprawiono błąd wyświetlania liczby nieodebranych nagród (wyświetlało `-1`).
 *   **SPA Navigation**: Rozwiązano problem z powrotem do ekranu logowania przy zamykaniu podstron (Kolekcja, Osiągnięcia) poprzez poprawne użycie `window.parent.closeSubpage()`.
+*   **Sterowanie Mobilne**: Naprawiono błąd w `js/game_core.js`, gdzie przycisk KICK (C) wykonywał rzut (Special) dla drugiego gracza (role=1).
+*   **Crash 2vs2 Chaos**: Wyeliminowano `ReferenceError` w `js/game_core.js` poprzez poprawienie kolejności deklaracji zmiennych podglądu postaci.
 
 ---
 
