@@ -34,19 +34,33 @@ Zweryfikowano i poprawiono linki do profili Spotify dla 24 artystów w `js/data/
 
 ---
 
-# PLAN NA JUTRO (PRIORYTET KRYTYCZNY)
+# Podsumowanie Prac - Sesja Popołudniowa (2026-02-20)
 
-### 1. Nowy System Zapisu (CRITICAL BLOCKER)
-Obecny system zapisuje jedynie pieniądze. Ze względu na błąd krytyczny uniemożliwiający wydanie gry, konieczne jest wdrożenie kompleksowego systemu zapisu stanu gracza na serwerze.
-*   **Zakres danych do zapisu**:
-    *   Kolekcja kart (otwarte i posiadane).
-    *   Historia otwartych pakietów.
-    *   Osiągnięcia (Achievements).
-    *   Ekwipunek (przedmioty zdobyte/kupione).
-    *   Skład Ekipy (Crew).
-    *   Drzewko Umiejętności (Skill Tree).
-*   **Mechanizm Autosave**: Wdrożenie automatycznego zapisu wszystkich powyższych danych co **20 sekund** w tle (bez przerywania rozgrywki).
-*   **Naprawa Resetowania Osiągnięć**: Naprawienie błędu, przez który osiągnięcie "Obserwuj Twórcę" (Follow Creator) resetuje się po każdym logowaniu.
+### 1. Wdrożenie Systemu Autosave (FULL SYNC)
+*   **SaveManager.js**: Utworzono nowy menedżer pracujący w tle, który co 20 sekund synchronizuje pełny stan gracza (kolekcja, ekonomia, osiągnięcia, statystyki, ekwipunek, perki) z serwerem.
+*   **Backend Sync**: Dodano endpoint `PUT /api/auth/profile/sync`, który bezpiecznie aktualizuje dokument profilu w MongoDB Atlas.
+*   **Eliminacja LocalStorage**: Gra teraz polega na danych z serwera wstrzykiwanych podczas logowania, co eliminuje błędy związane z niespójnością lokalnej pamięci podręcznej.
 
-### 2. Aktualizacja Linków Social Media
-*   Większość linków do social mediów graczy w plikach konfiguracyjnych jest niepoprawna lub nieaktualna. Należy je zweryfikować i zaktualizować (Instagram, YouTube, Spotify itp.).
+### 2. Wielka Naprawa Baz Danych i Kart
+*   **Kategoryzacja Postaci**: Przeniesiono postać **Little** z listy raperów do listy Producentów/DJ-ów, co naprawiło błędy w jego karcie (teraz posiada właściwy typ `PROD.DJ.MIX`).
+*   **Naprawa Składni cards.js**: Wyeliminowano liczne błędy `SyntaxError` (brakujące klamry, cudzysłowy przy linkach Spotify/Instagram), które powodowały błąd `ReferenceError: CARD_TIERS is not defined` i uniemożliwiały start trybu RPG.
+*   **Weryfikacja Danych**:
+    *   **Pat Kustoms**: Poprawiono nazwę (dodano spację) oraz zaktualizowano link do kanału YouTube na `@dailygrind2020`.
+    *   **Steez**: Zaktualizowano link do kanału YouTube.
+    *   **Lanek**: Zaktualizowano link do Instagrama (`lanek_1`).
+    *   **Poprawa generowania linków**: Naprawiono błąd w `cards.js`, przez który linki do social mediów Producentów i Dziennikarzy nie były poprawnie pobierane z ich obiektów konfiguracyjnych.
+
+### 3. Poprawki Błędów i Stabilizacja
+*   **Achievement Counter**: Naprawiono błąd wyświetlania liczby nieodebranych nagród (wyświetlało `-1`).
+*   **SPA Navigation**: Rozwiązano problem z powrotem do ekranu logowania przy zamykaniu podstron (Kolekcja, Osiągnięcia) poprzez poprawne użycie `window.parent.closeSubpage()`.
+
+---
+
+# PLAN NA KOLEJNE ETAPY
+
+### 1. Dalsza Weryfikacja Balansu
+*   Testowanie tempa zdobywania kart w trybie RPG przy nowym systemie zapisu.
+*   Weryfikacja czy wszystkie rzadkości kart (Tiers) generują się poprawnie dla nowych postaci.
+
+### 2. Rozszerzenie Statystyk
+*   Dodanie bardziej szczegółowych statystyk w profilu gracza (np. "Najczęściej używana karta", "Wygrane pod rząd").
