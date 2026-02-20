@@ -3165,15 +3165,23 @@ function handleMainMenuSelection() {
         showOptionsScreen()
     } else if (mainMenuIndex === 7) {
         // FULLSCREEN
-        if (!document.fullscreenElement) {
-            const fs = document.documentElement.requestFullscreen();
-            if (fs && fs.catch) {
-                fs.catch(err => {
-                    console.log(`Fullscreen error: ${err.message}`);
-                });
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            const el = document.documentElement;
+            const requestMethod = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+
+            if (requestMethod) {
+                const fs = requestMethod.call(el);
+                if (fs && fs.catch) {
+                    fs.catch(function (err) {
+                        console.log("Fullscreen error: " + err.message);
+                    });
+                }
+            } else {
+                console.log("Fullscreen API not supported on this device/browser (e.g. iPhone Safari)");
             }
         } else {
-            document.exitFullscreen();
+            const exitMethod = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (exitMethod) exitMethod.call(document);
         }
     } else if (mainMenuIndex === 8) {
         // TRAINING (TRENING)
